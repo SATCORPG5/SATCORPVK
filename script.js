@@ -45,7 +45,7 @@
 
   $("#signinForm")?.addEventListener("submit", (e) => {
     e.preventDefault();
-    pulse("AUTH OK • ROUTING… (demo)");
+    pulse("AUTH OK • ROUTING TO LOBBY… (demo)");
     setTimeout(() => pulse("SYSTEM ONLINE • READY"), 1500);
     const m = $("#signin"); if (m) closeModal(m);
   });
@@ -59,11 +59,11 @@
 
   $("#guest")?.addEventListener("click", (e) => {
     e.preventDefault();
-    pulse("GUEST SESSION • LIMITED ACCESS (demo)");
+    pulse("GUEST SESSION • READ-ONLY ACCESS (demo)");
     setTimeout(() => pulse("SYSTEM ONLINE • READY"), 1600);
   });
 
-  // Matrix Rain
+  // SATCORP Rain
   const canvas = $("#matrix");
   if (!canvas) return;
   const ctx = canvas.getContext("2d", { alpha: true });
@@ -71,11 +71,36 @@
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (prefersReduced) return;
 
-  let w=0, h=0, dpr=1, cols=0;
-  let fontSize = 16;
-  let drops = [];
-  const glyphs = "アカサタナハマヤラワ0123456789$#%&*+-<>|:_=SATCORPΞ";
-  const pick = () => glyphs[Math.floor(Math.random()*glyphs.length)];
+  // SATCORP-ish token stream (not movie-like glyphs)
+  const TOKENS = [
+    "SATCORP", "KYRAX", "PULSΞ", "Ki-Ra", "Ξ", "Δ", "Σ", "Λ", "Ω",
+    "NODE", "CHAN", "PORT", "EDGE", "SYNC", "AUTH", "GUEST", "TIER",
+    "OPS", "TASK", "QUEUE", "EVENT", "HOOK", "WORKER", "D1", "KV",
+    "PING", "ACK", "OK", "WARN", "LOCK", "OPEN", "READY",
+    "ID", "UID", "HASH", "JWT", "SIG", "TTL", "CSRF",
+    "v0.1", "v0.2", "alpha", "beta"
+  ];
+
+  const VERBS = ["ALLOC", "ROUTE", "VERIFY", "EMIT", "PATCH", "MERGE", "BIND", "INDEX", "REPLAY", "THROTTLE"];
+  const hex = () => Math.floor(Math.random()*16).toString(16).toUpperCase();
+  const rand = (a,b)=>a+Math.random()*(b-a);
+  const pick = (arr)=>arr[Math.floor(Math.random()*arr.length)];
+
+  function makeAtom(){
+    const r = Math.random();
+    if (r < 0.30) return pick(TOKENS);
+    if (r < 0.52) return `${pick(VERBS)}:${pick(TOKENS)}`;
+    if (r < 0.70) return `N-${hex()}${hex()}${hex()}${hex()}`;
+    if (r < 0.84) return `${hex()}${hex()}${hex()}${hex()}-${hex()}${hex()}${hex()}${hex()}`;
+    if (r < 0.93) return `OP#${Math.floor(rand(100,999))}`;
+    return "Ξ";
+  }
+
+  // We draw per-column “streams” of atoms (strings), not single glyphs.
+  let w=0, h=0, dpr=1;
+  let fontSize = 15;
+  let cols = 0;
+  let streams = [];
 
   function resize(){
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -87,38 +112,56 @@
     canvas.style.height = h + "px";
     ctx.setTransform(dpr,0,0,dpr,0,0);
 
-    fontSize = w < 520 ? 14 : 16;
-    cols = Math.floor(w / fontSize);
-    drops = new Array(cols).fill(0).map(() => Math.floor(Math.random()*h/fontSize));
+    fontSize = w < 520 ? 14 : 15;
+    cols = Math.floor(w / (fontSize * 0.95));
+
+    streams = new Array(cols).fill(0).map((_, i) => {
+      const speed = rand(0.6, 1.4);
+      const y = rand(-h, 0);
+      const density = rand(0.55, 0.90); // how often tokens appear
+      return { x: i * (fontSize * 0.95), y, speed, density };
+    });
+
     ctx.font = `600 ${fontSize}px JetBrains Mono`;
+    ctx.textBaseline = "top";
   }
   window.addEventListener("resize", resize, { passive:true });
   resize();
 
   function frame(){
-    // fade trails
-    ctx.fillStyle = "rgba(2,6,4,0.08)";
+    // softer trails, more “terminal glass”
+    ctx.fillStyle = "rgba(2,6,4,0.10)";
     ctx.fillRect(0,0,w,h);
 
-    // draw glyphs
-    for (let i=0; i<cols; i++){
-      const x = i * fontSize;
-      const y = drops[i] * fontSize;
+    for (const s of streams){
+      // advance stream
+      s.y += s.speed * fontSize;
 
-      // brighter head
-      ctx.fillStyle = "rgba(125,255,178,0.95)";
-      ctx.fillText(pick(), x, y);
+      // token probability
+      if (Math.random() < s.density){
+        const atom = makeAtom();
 
-      // dim tail glyph (slight offset)
-      ctx.fillStyle = "rgba(25,255,106,0.55)";
-      ctx.fillText(pick(), x, y - fontSize);
+        // head glow (brighter)
+        ctx.fillStyle = "rgba(125,255,178,0.92)";
+        ctx.fillText(atom, s.x, s.y);
 
-      // advance
-      drops[i] += Math.random() > 0.92 ? 2 : 1;
+        // faint tail echo behind it
+        ctx.fillStyle = "rgba(25,255,106,0.28)";
+        ctx.fillText(atom, s.x, s.y - fontSize * 1.2);
+      }
+
+      // occasionally “burst” extra atoms
+      if (Math.random() > 0.992){
+        const burst = `${pick(VERBS)}:${pick(TOKENS)}:${hex()}${hex()}`;
+        ctx.fillStyle = "rgba(25,255,106,0.50)";
+        ctx.fillText(burst, s.x, s.y + fontSize);
+      }
 
       // reset
-      if (y > h && Math.random() > 0.975){
-        drops[i] = 0;
+      if (s.y > h + 120){
+        s.y = rand(-h, -120);
+        s.speed = rand(0.6, 1.4);
+        s.density = rand(0.55, 0.90);
       }
     }
 
