@@ -3,182 +3,191 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SATCORP — Ops Server</title>
-  <meta name="description" content="SATCORP: Concierge-grade systems, brand, and build." />
-  <meta name="theme-color" content="#0b0f17" />
+  <title>SATCORP — Gateway</title>
+  <meta name="description" content="Enter the SATCORP ops server." />
+  <meta name="theme-color" content="#070914" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="app" id="app">
-    <!-- Server Rail -->
-    <aside class="rail" aria-label="Servers">
-      <div class="rail__top">
-        <button class="srv srv--active" data-panel="home" title="SATCORP Ops">
-          <span class="srv__dot"></span>
-          <span class="srv__glyph">S</span>
-        </button>
-        <button class="srv" data-panel="work" title="Client Work">
-          <span class="srv__glyph">W</span>
-        </button>
-        <button class="srv" data-panel="vault" title="Vault">
-          <span class="srv__glyph">V</span>
-        </button>
-        <button class="srv" data-panel="labs" title="Labs">
-          <span class="srv__glyph">L</span>
-        </button>
-      </div>
+  <!-- Background scene -->
+  <div class="scene" aria-hidden="true">
+    <div class="scene__grid"></div>
+    <div class="scene__glow scene__glow--a"></div>
+    <div class="scene__glow scene__glow--b"></div>
+    <div class="scene__noise"></div>
+  </div>
 
-      <div class="rail__bottom">
-        <button class="srv srv--ghost" id="themeToggle" title="Toggle theme">
-          <span class="srv__glyph">☼</span>
-        </button>
-        <a class="srv srv--ghost" href="#quote" title="Request a Quote">
-          <span class="srv__glyph">+</span>
-        </a>
-      </div>
-    </aside>
-
-    <!-- Channel List -->
-    <aside class="channels" aria-label="Channels">
-      <div class="channels__header">
-        <div class="brand">
-          <div class="brand__mark">SATCORP</div>
-          <div class="brand__sub">Ops Server</div>
-        </div>
-        <button class="pill" id="copyLink" title="Copy site link">Copy Invite</button>
-      </div>
-
-      <div class="channels__search">
-        <input id="search" type="search" placeholder="Search channels…" autocomplete="off" />
-      </div>
-
-      <div class="channels__group">
-        <div class="channels__groupTitle">WELCOME</div>
-        <button class="ch ch--active" data-channel="start"># start-here</button>
-        <button class="ch" data-channel="services"># services</button>
-        <button class="ch" data-channel="proof"># proof</button>
-      </div>
-
-      <div class="channels__group">
-        <div class="channels__groupTitle">OFFERINGS</div>
-        <button class="ch" data-channel="web"># websites</button>
-        <button class="ch" data-channel="brand"># brand-systems</button>
-        <button class="ch" data-channel="automation"># automation</button>
-        <button class="ch" data-channel="content"># content-systems</button>
-      </div>
-
-      <div class="channels__group">
-        <div class="channels__groupTitle">CONTACT</div>
-        <button class="ch" data-channel="quote"># request-a-quote</button>
-        <button class="ch" data-channel="faq"># faq</button>
-      </div>
-
-      <div class="me">
-        <div class="me__avatar" aria-hidden="true">A</div>
-        <div class="me__meta">
-          <div class="me__name">ANU</div>
-          <div class="me__status"><span class="dot"></span>online • concierge</div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Main Chat -->
-    <main class="main" aria-label="Chat">
-      <header class="topbar">
-        <div class="topbar__left">
-          <div class="hash">#</div>
-          <div>
-            <div class="topbar__title" id="channelTitle">start-here</div>
-            <div class="topbar__subtitle" id="channelSubtitle">What SATCORP is and how to work with us.</div>
+  <main class="shell">
+    <section class="gate" role="region" aria-label="SATCORP Gateway">
+      <header class="gate__head">
+        <div class="sig">
+          <div class="sig__mark">S</div>
+          <div class="sig__meta">
+            <div class="sig__name">SATCORP</div>
+            <div class="sig__sub">Ops Gateway • Access Required</div>
           </div>
         </div>
 
-        <div class="topbar__right">
-          <a class="btn btn--ghost" href="#services">Services</a>
-          <a class="btn btn--ghost" href="#proof">Proof</a>
-          <a class="btn btn--primary" href="#quote">Request a Quote</a>
+        <div class="status">
+          <span class="status__dot"></span>
+          <span class="status__text">Systems online</span>
+          <span class="status__sep">•</span>
+          <span class="status__hint">Choose an entry method</span>
         </div>
       </header>
 
-      <section class="feed" id="feed"></section>
+      <div class="gate__body">
+        <!-- Left: cinematic panel -->
+        <div class="panel">
+          <div class="panel__badge">
+            <span class="chip">SECURE</span>
+            <span class="chip chip--violet">VIOLET-LINK</span>
+            <span class="chip chip--rose">SIGNAL</span>
+          </div>
 
-      <footer class="composer" aria-label="Composer">
-        <div class="composer__inner">
-          <div class="composer__hint">This isn’t a real chat — but you can “type” to filter content.</div>
-          <input id="composerInput" type="text" placeholder="Message #start-here" />
-          <button class="send" id="sendBtn" aria-label="Send">↵</button>
+          <h1 class="panel__title">
+            Enter the <span class="accent">SATCORP</span> network.
+          </h1>
+
+          <p class="panel__lead">
+            A Discord-like ops space for clients, builds, and systems. Clean structure. Fast execution.
+          </p>
+
+          <div class="panel__cards">
+            <div class="mini">
+              <div class="mini__k">Access</div>
+              <div class="mini__v">Role-gated channels</div>
+            </div>
+            <div class="mini">
+              <div class="mini__k">Flow</div>
+              <div class="mini__v">No clutter • clear paths</div>
+            </div>
+            <div class="mini">
+              <div class="mini__k">Output</div>
+              <div class="mini__v">Organized delivery</div>
+            </div>
+          </div>
+
+          <div class="panel__foot">
+            <div class="mono">Tip:</div>
+            <div class="panel__tip">
+              Guests can browse public channels, request a quote, and upgrade later.
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: action panel -->
+        <div class="access">
+          <div class="access__top">
+            <div class="access__title">Choose your entry</div>
+            <div class="access__sub">You can switch modes later.</div>
+          </div>
+
+          <div class="access__actions">
+            <button class="btn btn--primary" id="btnSignup">
+              <span class="btn__icon">✦</span>
+              <span class="btn__text">
+                <b>Sign up</b>
+                <span>Create an account</span>
+              </span>
+              <span class="btn__arrow">→</span>
+            </button>
+
+            <button class="btn btn--ghost" id="btnSignin">
+              <span class="btn__icon">⌁</span>
+              <span class="btn__text">
+                <b>Sign in</b>
+                <span>Continue your session</span>
+              </span>
+              <span class="btn__arrow">→</span>
+            </button>
+
+            <button class="btn btn--soft" id="btnGuest">
+              <span class="btn__icon">⟡</span>
+              <span class="btn__text">
+                <b>Join as guest</b>
+                <span>Browse public channels</span>
+              </span>
+              <span class="btn__arrow">→</span>
+            </button>
+          </div>
+
+          <div class="access__fine">
+            <div class="fine__row">
+              <span class="fine__k">Guest mode:</span>
+              <span class="fine__v">No password • limited features</span>
+            </div>
+            <div class="fine__row">
+              <span class="fine__k">Accounts:</span>
+              <span class="fine__v">Save projects • private channels</span>
+            </div>
+          </div>
+
+          <!-- Modal -->
+          <div class="modal" id="modal" aria-hidden="true">
+            <div class="modal__backdrop" data-close="1"></div>
+            <div class="modal__card" role="dialog" aria-modal="true" aria-label="Access modal">
+              <div class="modal__head">
+                <div class="modal__title" id="modalTitle">Access</div>
+                <button class="x" data-close="1" aria-label="Close">✕</button>
+              </div>
+
+              <form class="form" id="modalForm">
+                <div class="form__grid">
+                  <label class="field" id="fieldName">
+                    <span>Name</span>
+                    <input name="name" placeholder="Your name" autocomplete="name" />
+                  </label>
+
+                  <label class="field" id="fieldEmail">
+                    <span>Email</span>
+                    <input name="email" placeholder="you@domain.com" autocomplete="email" />
+                  </label>
+
+                  <label class="field" id="fieldPass">
+                    <span>Password</span>
+                    <input name="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+                  </label>
+                </div>
+
+                <label class="field" id="fieldNote">
+                  <span>What are you trying to build?</span>
+                  <textarea name="note" rows="3" placeholder="Website, brand, automation, content system…"></textarea>
+                </label>
+
+                <div class="form__actions">
+                  <button type="button" class="btn btn--ghost" data-close="1">Cancel</button>
+                  <button type="submit" class="btn btn--primary" id="modalSubmit">Continue</button>
+                </div>
+
+                <p class="micro" id="microNote">
+                  Demo only — this doesn’t create accounts yet. Next we wire it to auth + database.
+                </p>
+              </form>
+            </div>
+          </div>
+
+          <p class="legal">
+            By continuing you agree to the <a href="#" onclick="return false;">Terms</a> and
+            <a href="#" onclick="return false;">Privacy</a>.
+          </p>
+        </div>
+      </div>
+
+      <footer class="gate__foot">
+        <div class="foot__left">
+          <span class="pill">ANU • Concierge</span>
+          <span class="pill pill--muted">KYRAX • Systems</span>
+        </div>
+        <div class="foot__right">
+          <span class="mono" id="clock">--:--</span>
         </div>
       </footer>
-    </main>
-
-    <!-- Right Sidebar -->
-    <aside class="side" aria-label="Sidebar">
-      <div class="card">
-        <div class="card__title">Server Status</div>
-        <div class="kv">
-          <div class="k">Response</div><div class="v">Fast • Clear • Direct</div>
-          <div class="k">Delivery</div><div class="v">Organized handoff</div>
-          <div class="k">Stack</div><div class="v">Web • Brand • Automation</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card__title">Members</div>
-        <div class="members">
-          <div class="m"><span class="dot dot--on"></span><b>ANU</b><span class="muted">Concierge</span></div>
-          <div class="m"><span class="dot dot--on"></span><b>KYRAX</b><span class="muted">Systems</span></div>
-          <div class="m"><span class="dot dot--idle"></span><b>PULSΞ</b><span class="muted">Broadcast</span></div>
-          <div class="m"><span class="dot dot--off"></span><b>Client</b><span class="muted">You</span></div>
-        </div>
-      </div>
-
-      <div class="card" id="quote">
-        <div class="card__title">Request a Quote</div>
-        <form class="form" id="quoteForm">
-          <label>
-            <span>Name</span>
-            <input required name="name" placeholder="Your name" />
-          </label>
-          <label>
-            <span>Business</span>
-            <input name="biz" placeholder="Business name (optional)" />
-          </label>
-          <label>
-            <span>What do you need?</span>
-            <select name="need" required>
-              <option value="" selected disabled>Select…</option>
-              <option>Website (new)</option>
-              <option>Website (redesign)</option>
-              <option>Brand identity</option>
-              <option>Automation / bots</option>
-              <option>Content / overlays</option>
-            </select>
-          </label>
-          <label>
-            <span>Budget range</span>
-            <select name="budget" required>
-              <option value="" selected disabled>Select…</option>
-              <option>$250–$500</option>
-              <option>$500–$1,500</option>
-              <option>$1,500–$5,000</option>
-              <option>$5,000+</option>
-            </select>
-          </label>
-          <label>
-            <span>Details</span>
-            <textarea name="details" rows="4" placeholder="Goals, timeline, links, anything helpful…"></textarea>
-          </label>
-          <button class="btn btn--primary" type="submit">Send Request</button>
-          <p class="fineprint">
-            This demo form stores nothing. Hook it to Email/Forms later.
-          </p>
-        </form>
-      </div>
-    </aside>
-  </div>
+    </section>
+  </main>
 
   <script src="script.js"></script>
 </body>
