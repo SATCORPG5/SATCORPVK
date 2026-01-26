@@ -4,100 +4,258 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>NEOCORE // MATRIX INTERFACE</title>
-  <meta name="description" content="Ultra-realistic CRT Matrix-style landing interface." />
-  <meta name="theme-color" content="#020603" />
+  <title>ANUNNAKI — The Tablets Awaken</title>
+  <meta name="description" content="An obsidian-gold interface inspired by ancient Sumer and starborne myth." />
+  <meta name="theme-color" content="#07060a" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-  <!-- Background -->
-  <canvas id="rain" aria-hidden="true"></canvas>
+  <!-- Ambient layers -->
+  <div class="bg">
+    <canvas id="stars" aria-hidden="true"></canvas>
+    <div class="nebula" aria-hidden="true"></div>
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+  </div>
 
-  <!-- Cinematic/CRT overlays -->
-  <div class="vignette" aria-hidden="true"></div>
-  <div class="bloom" aria-hidden="true"></div>
-  <div class="scanlines" aria-hidden="true"></div>
-  <div class="mask" aria-hidden="true"></div>
-  <div class="grain" aria-hidden="true"></div>
-  <div class="crt" aria-hidden="true"></div>
-  <div class="roll" aria-hidden="true"></div>
-
-  <!-- Top HUD -->
-  <header class="hud">
-    <div class="hud__left">
-      <span class="dot"></span>
-      <span class="label">SYSTEM</span>
-      <span class="value">ONLINE</span>
+  <header class="topbar">
+    <div class="brand">
+      <span class="sigil" aria-hidden="true">𒀭</span>
+      <div class="brand__text">
+        <div class="brand__name">ANUNNAKI</div>
+        <div class="brand__sub">Tablets • Starborn • Dominion</div>
+      </div>
     </div>
 
-    <div class="hud__center">
-      <span class="chip">NEOCORE</span>
-      <span class="sep">/</span>
-      <span class="chip chip--soft">ACCESS NODE</span>
-    </div>
+    <nav class="nav">
+      <a href="#lore">Lore</a>
+      <a href="#tablets">Tablets</a>
+      <a href="#portal">Portal</a>
+    </nav>
 
-    <div class="hud__right">
-      <span class="label">LATENCY</span>
-      <span class="value" id="latency">0ms</span>
-    </div>
+    <button id="muteBtn" class="chip" type="button" aria-pressed="false" title="Toggle ambient hum">
+      AMBIENT: OFF
+    </button>
   </header>
 
-  <!-- Main -->
   <main class="wrap">
-    <section class="panel">
-      <div class="panel__top">
-        <div class="panel__title">
-          <span class="tag">MATRIX</span>
-          <span class="tag tag--dim">TERMINAL</span>
-        </div>
-        <div class="panel__lights" aria-hidden="true">
-          <span class="light"></span><span class="light"></span><span class="light"></span>
-        </div>
-      </div>
-
-      <h1 class="hero glitch" data-text="ENTER THE SIGNAL">ENTER THE SIGNAL</h1>
-
-      <p class="sub">
-        A hardened interface for operators. Authenticate, jack in, or proceed as a ghost.
-      </p>
-
-      <div class="actions">
-        <a class="btn" href="#signin">SIGN IN</a>
-        <a class="btn btn--ghost" href="#signup">SIGN UP</a>
-        <a class="btn btn--wire" href="#guest">JOIN AS GUEST</a>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="terminal" role="region" aria-label="Console output">
-        <div class="terminal__header">
-          <span class="terminal__name">console://neocore</span>
-          <span class="terminal__meta" id="clock">--:--:--</span>
+    <section class="hero">
+      <div class="hero__left">
+        <div class="badge">
+          <span class="dot"></span>
+          <span>CELESTIAL ARCHIVE ONLINE</span>
         </div>
 
-        <div class="terminal__body" id="log" aria-live="polite"></div>
+        <h1>
+          The <span class="gold">Tablets</span> Awaken.
+          <br/>
+          Enter the <span class="gold">Star-Sanctum</span>.
+        </h1>
 
-        <form class="cmd" id="cmdForm" autocomplete="off">
-          <span class="cmd__prompt">operator@matrix:~$</span>
-          <input id="cmdInput" class="cmd__input" name="cmd" spellcheck="false" autocapitalize="off" autocomplete="off" />
-          <button class="cmd__send" type="submit">EXEC</button>
-        </form>
+        <p class="lead">
+          A myth-tech interface forged from obsidian stone and luminous gold.
+          Decode the tablets, activate the portal, and listen to the hum between stars.
+        </p>
 
-        <div class="hint">
-          Try: <code>help</code>, <code>status</code>, <code>clear</code>, <code>jack-in</code>
+        <div class="cta">
+          <a class="btn btn--primary" href="#portal">Enter Portal</a>
+          <a class="btn btn--ghost" href="#tablets">Read Tablets</a>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat__k">𒆳</div>
+            <div class="stat__v">KUR Gate</div>
+            <div class="stat__d">sealed • awaiting key</div>
+          </div>
+          <div class="stat">
+            <div class="stat__k">𒀭</div>
+            <div class="stat__v">Divine Node</div>
+            <div class="stat__d">synced • stable</div>
+          </div>
+          <div class="stat">
+            <div class="stat__k">𒂗</div>
+            <div class="stat__v">En-Protocol</div>
+            <div class="stat__d">active • whispering</div>
+          </div>
         </div>
       </div>
 
-      <footer class="foot">
-        <span>© <span id="year"></span> NEOCORE</span>
-        <span class="muted">// “There is no spoon.”</span>
-      </footer>
+      <div class="hero__right">
+        <div class="tablet">
+          <div class="tablet__rim">
+            <div class="tablet__hdr">
+              <div class="tablet__title">CELESTIAL TABLET // INTERPRETER</div>
+              <div class="tablet__lights" aria-hidden="true">
+                <span class="l l1"></span><span class="l l2"></span><span class="l l3"></span>
+              </div>
+            </div>
+
+            <div class="tablet__body">
+              <div class="glyphgrid" aria-hidden="true">
+                <span>𒀭</span><span>𒂗</span><span>𒆳</span><span>𒋀</span><span>𒄑</span>
+                <span>𒌋</span><span>𒁹</span><span>𒅆</span><span>𒊩</span><span>𒇽</span>
+                <span>𒉌</span><span>𒀀</span><span>𒌨</span><span>𒄿</span><span>𒍣</span>
+              </div>
+
+              <div class="terminal" role="region" aria-label="Tablet terminal">
+                <div class="terminal__line">
+                  <span class="prompt">TABLET:</span> <span class="muted">init</span>
+                </div>
+                <div class="terminal__line">
+                  <span class="prompt">STATUS:</span> <span class="ok">connected</span>
+                </div>
+                <div class="terminal__line">
+                  <span class="prompt">QUERY:</span> <span class="type" id="typeLine"></span><span class="caret">▍</span>
+                </div>
+                <div class="terminal__line muted small">
+                  Hint: Try <b>awakening</b>, <b>origin</b>, or <b>portal</b>.
+                </div>
+
+                <div class="terminal__input">
+                  <input id="cmd" type="text" spellcheck="false" autocomplete="off" placeholder="speak to the tablet…" />
+                  <button id="send" class="btn btn--mini" type="button">SEND</button>
+                </div>
+
+                <div id="log" class="terminal__log" aria-live="polite"></div>
+              </div>
+            </div>
+
+            <div class="tablet__ftr">
+              <span class="tag">OBSIDIAN MATRIX</span>
+              <span class="tag">GOLDEN GLYPH BUS</span>
+              <span class="tag">STARFIELD SYNC</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
+
+    <section id="lore" class="grid2">
+      <div class="card">
+        <h2>Myth-Tech Lore</h2>
+        <p>
+          This theme blends ancient Sumerian motifs, monumental stone, and a subtle sci-fi interface.
+          Think “temple chamber meets starship console.”
+        </p>
+        <ul class="bullets">
+          <li><b>Obsidian</b> for depth and weight</li>
+          <li><b>Gold</b> for divine circuitry</li>
+          <li><b>Glyphs</b> as living UI language</li>
+          <li><b>Stars</b> as the ever-watching archive</li>
+        </ul>
+      </div>
+
+      <div class="card card--highlight">
+        <h2>The Sigil</h2>
+        <p>
+          The mark <span class="gold">𒀭</span> appears across many cuneiform texts to indicate divinity.
+          Here it functions like a “system seal” — the interface is under celestial authority.
+        </p>
+        <div class="sigilBig" aria-hidden="true">𒀭</div>
+      </div>
+    </section>
+
+    <section id="tablets" class="tablets">
+      <div class="sectionTitle">
+        <h2>Tablets of Access</h2>
+        <p>Choose a tablet. Each reveals a different “channel.”</p>
+      </div>
+
+      <div class="tileGrid">
+        <button class="tile" data-reveal="awaken">
+          <div class="tile__top">
+            <span class="chip chip--gold">𒂗 EN</span>
+            <span class="chip">PROTOCOL</span>
+          </div>
+          <div class="tile__mid">Awakening Sequence</div>
+          <div class="tile__btm">Initiate resonance and prime the gate.</div>
+        </button>
+
+        <button class="tile" data-reveal="origin">
+          <div class="tile__top">
+            <span class="chip chip--gold">𒀭 DINGIR</span>
+            <span class="chip">ARCHIVE</span>
+          </div>
+          <div class="tile__mid">Origin Fragment</div>
+          <div class="tile__btm">Decode the oldest record from the vault.</div>
+        </button>
+
+        <button class="tile" data-reveal="portal">
+          <div class="tile__top">
+            <span class="chip chip--gold">𒆳 KUR</span>
+            <span class="chip">GATE</span>
+          </div>
+          <div class="tile__mid">Portal Key</div>
+          <div class="tile__btm">Unlock traversal between chambers.</div>
+        </button>
+      </div>
+
+      <div class="reveal card" id="revealCard" hidden>
+        <div class="reveal__hdr">
+          <span class="chip chip--gold" id="revealTag">TABLET</span>
+          <button class="btn btn--mini" id="closeReveal" type="button">CLOSE</button>
+        </div>
+        <h3 id="revealTitle">—</h3>
+        <p id="revealText" class="muted">—</p>
+      </div>
+    </section>
+
+    <section id="portal" class="portal">
+      <div class="card portal__card">
+        <h2>Portal Chamber</h2>
+        <p class="muted">
+          This is where you plug in your real content: signup/signin, product, lore book, stream portal,
+          or a full SATCORP “Anunnaki console” gateway.
+        </p>
+
+        <div class="portal__grid">
+          <div class="portal__pane">
+            <div class="paneTitle">Access Modes</div>
+            <div class="paneBtns">
+              <button class="btn btn--primary" type="button" id="btnSignup">Sign Up</button>
+              <button class="btn btn--ghost" type="button" id="btnSignin">Sign In</button>
+              <button class="btn btn--ghost" type="button" id="btnGuest">Join as Guest</button>
+            </div>
+            <div class="small muted">
+              Hook these buttons to real routes later (e.g. <code>/signup</code>, <code>/signin</code>, <code>/guest</code>).
+            </div>
+          </div>
+
+          <div class="portal__pane">
+            <div class="paneTitle">Transmission</div>
+            <form class="form" id="contactForm">
+              <label>
+                <span>Signal Name</span>
+                <input required name="name" placeholder="Operator name…" />
+              </label>
+              <label>
+                <span>Signal</span>
+                <textarea required name="msg" rows="4" placeholder="Your message to the chamber…"></textarea>
+              </label>
+              <button class="btn btn--primary" type="submit">Transmit</button>
+              <div id="formNote" class="small muted" aria-live="polite"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="muted small">
+        © <span id="year"></span> ANUNNAKI INTERFACE • Built in obsidian & gold.
+      </div>
+    </footer>
   </main>
+
+  <audio id="hum" loop preload="auto">
+    <!-- Tiny embedded hum (data URI) is optional — left empty by default.
+         If you want real audio, drop a local file like /hum.mp3 and set src in JS. -->
+  </audio>
 
   <script src="script.js"></script>
 </body>
