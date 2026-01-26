@@ -1,79 +1,81 @@
 (() => {
-  const $ = (s, root = document) => root.querySelector(s);
-  const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
 
-  // Modal logic
+  // Clock
+  const clock = $("#clock");
+  const pad = (n) => String(n).padStart(2,"0");
+  function tick(){
+    const d = new Date();
+    if (clock) clock.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    requestAnimationFrame(() => setTimeout(tick, 250));
+  }
+  tick();
+
+  // Modals
   function openModal(id){
     const m = document.getElementById(id);
     if (!m) return;
     m.classList.add("is-open");
-    m.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-    // focus first input
+    m.setAttribute("aria-hidden","false");
+    document.body.style.overflow="hidden";
     const first = $("input", m);
     if (first) setTimeout(() => first.focus(), 0);
   }
   function closeModal(m){
     m.classList.remove("is-open");
-    m.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
+    m.setAttribute("aria-hidden","true");
+    document.body.style.overflow="";
   }
 
-  $$("[data-open]").forEach(btn => {
-    btn.addEventListener("click", () => openModal(btn.dataset.open));
-  });
-
-  $$(".modal").forEach(m => {
-    m.addEventListener("click", (e) => {
-      const t = e.target;
-      if (t.matches("[data-close]")) closeModal(m);
-    });
-  });
-
+  $$("[data-open]").forEach(b => b.addEventListener("click", () => openModal(b.dataset.open)));
+  $$(".modal").forEach(m => m.addEventListener("click", (e) => {
+    if (e.target.matches("[data-close]")) closeModal(m);
+  }));
   document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape") return;
-    const open = $(".modal.is-open");
-    if (open) closeModal(open);
+    if (e.key === "Escape"){
+      const open = $(".modal.is-open");
+      if (open) closeModal(open);
+    }
   });
 
-  // Demo submissions (no backend)
+  // Demo actions
   const status = $("#statusText");
   const pulse = (msg) => { if (status) status.textContent = msg; };
 
   $("#signinForm")?.addEventListener("submit", (e) => {
     e.preventDefault();
     pulse("AUTH OK • ROUTING… (demo)");
-    setTimeout(() => pulse("SYSTEM ONLINE • READY"), 1400);
-    const m = $("#signin");
-    if (m) closeModal(m);
+    setTimeout(() => pulse("SYSTEM ONLINE • READY"), 1500);
+    const m = $("#signin"); if (m) closeModal(m);
   });
 
   $("#signupForm")?.addEventListener("submit", (e) => {
     e.preventDefault();
     pulse("PROFILE CREATED • ASSIGNING TIER… (demo)");
-    setTimeout(() => pulse("SYSTEM ONLINE • READY"), 1600);
-    const m = $("#signup");
-    if (m) closeModal(m);
+    setTimeout(() => pulse("SYSTEM ONLINE • READY"), 1700);
+    const m = $("#signup"); if (m) closeModal(m);
   });
 
   $("#guest")?.addEventListener("click", (e) => {
     e.preventDefault();
     pulse("GUEST SESSION • LIMITED ACCESS (demo)");
     setTimeout(() => pulse("SYSTEM ONLINE • READY"), 1600);
-    // later: window.location.href = "/app";
   });
 
-  // Ambient FX (soft particles + scan drift)
-  const canvas = document.getElementById("fx");
+  // Matrix Rain
+  const canvas = $("#matrix");
   if (!canvas) return;
   const ctx = canvas.getContext("2d", { alpha: true });
 
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (prefersReduced) return;
 
-  let w=0,h=0,dpr=1;
-  const pts = [];
-  const rand = (a,b)=>a+Math.random()*(b-a);
+  let w=0, h=0, dpr=1, cols=0;
+  let fontSize = 16;
+  let drops = [];
+  const glyphs = "アカサタナハマヤラワ0123456789$#%&*+-<>|:_=SATCORPΞ";
+  const pick = () => glyphs[Math.floor(Math.random()*glyphs.length)];
 
   function resize(){
     dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -85,52 +87,42 @@
     canvas.style.height = h + "px";
     ctx.setTransform(dpr,0,0,dpr,0,0);
 
-    pts.length = 0;
-    const n = Math.floor(Math.min(120, Math.max(70, (w*h)/18000)));
-    for(let i=0;i<n;i++){
-      pts.push({
-        x: rand(0,w), y: rand(0,h),
-        r: rand(0.8, 2.2),
-        vx: rand(-0.12, 0.12),
-        vy: rand(-0.10, 0.10),
-        a: rand(0.05, 0.12)
-      });
-    }
+    fontSize = w < 520 ? 14 : 16;
+    cols = Math.floor(w / fontSize);
+    drops = new Array(cols).fill(0).map(() => Math.floor(Math.random()*h/fontSize));
+    ctx.font = `600 ${fontSize}px JetBrains Mono`;
   }
   window.addEventListener("resize", resize, { passive:true });
   resize();
 
-  let t=0;
-  function draw(){
-    t += 0.01;
-    ctx.clearRect(0,0,w,h);
+  function frame(){
+    // fade trails
+    ctx.fillStyle = "rgba(2,6,4,0.08)";
+    ctx.fillRect(0,0,w,h);
 
-    // scanline drift
-    ctx.globalAlpha = 0.07;
-    const y = (Math.sin(t*0.9)*0.5+0.5)*h;
-    const grd = ctx.createLinearGradient(0, y-140, 0, y+140);
-    grd.addColorStop(0, "rgba(138,92,255,0)");
-    grd.addColorStop(0.5, "rgba(138,92,255,0.35)");
-    grd.addColorStop(1, "rgba(138,92,255,0)");
-    ctx.fillStyle = grd;
-    ctx.fillRect(0, y-140, w, 280);
+    // draw glyphs
+    for (let i=0; i<cols; i++){
+      const x = i * fontSize;
+      const y = drops[i] * fontSize;
 
-    // particles
-    ctx.globalAlpha = 1;
-    for(const p of pts){
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < -20) p.x = w+20;
-      if (p.x > w+20) p.x = -20;
-      if (p.y < -20) p.y = h+20;
-      if (p.y > h+20) p.y = -20;
+      // brighter head
+      ctx.fillStyle = "rgba(125,255,178,0.95)";
+      ctx.fillText(pick(), x, y);
 
-      ctx.beginPath();
-      ctx.fillStyle = `rgba(177,139,255,${p.a})`;
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fill();
+      // dim tail glyph (slight offset)
+      ctx.fillStyle = "rgba(25,255,106,0.55)";
+      ctx.fillText(pick(), x, y - fontSize);
+
+      // advance
+      drops[i] += Math.random() > 0.92 ? 2 : 1;
+
+      // reset
+      if (y > h && Math.random() > 0.975){
+        drops[i] = 0;
+      }
     }
 
-    requestAnimationFrame(draw);
+    requestAnimationFrame(frame);
   }
-  requestAnimationFrame(draw);
+  requestAnimationFrame(frame);
 })();
