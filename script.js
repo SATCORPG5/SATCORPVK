@@ -1,93 +1,136 @@
-const $ = (s, el=document) => el.querySelector(s);
+(() => {
+  const $ = (s, root = document) => root.querySelector(s);
+  const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 
-const modal = $("#modal");
-const modalTitle = $("#modalTitle");
-const modalSubmit = $("#modalSubmit");
+  // Modal logic
+  function openModal(id){
+    const m = document.getElementById(id);
+    if (!m) return;
+    m.classList.add("is-open");
+    m.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    // focus first input
+    const first = $("input", m);
+    if (first) setTimeout(() => first.focus(), 0);
+  }
+  function closeModal(m){
+    m.classList.remove("is-open");
+    m.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
 
-const fieldName = $("#fieldName");
-const fieldEmail = $("#fieldEmail");
-const fieldPass = $("#fieldPass");
-const fieldNote = $("#fieldNote");
+  $$("[data-open]").forEach(btn => {
+    btn.addEventListener("click", () => openModal(btn.dataset.open));
+  });
 
-let mode = "guest"; // signup | signin | guest
+  $$(".modal").forEach(m => {
+    m.addEventListener("click", (e) => {
+      const t = e.target;
+      if (t.matches("[data-close]")) closeModal(m);
+    });
+  });
 
-function openModal(nextMode){
-  mode = nextMode;
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    const open = $(".modal.is-open");
+    if (open) closeModal(open);
+  });
 
-  // Show/hide fields by mode
-  // signup: name + email + password + note
-  // signin: email + password
-  // guest: name + note (optional)
-  fieldName.style.display = (mode === "signup" || mode === "guest") ? "" : "none";
-  fieldEmail.style.display = (mode === "signup" || mode === "signin") ? "" : "none";
-  fieldPass.style.display = (mode === "signup" || mode === "signin") ? "" : "none";
-  fieldNote.style.display = (mode === "signup" || mode === "guest") ? "" : "none";
+  // Demo submissions (no backend)
+  const status = $("#statusText");
+  const pulse = (msg) => { if (status) status.textContent = msg; };
 
-  modalTitle.textContent =
-    mode === "signup" ? "Sign up"
-    : mode === "signin" ? "Sign in"
-    : "Join as guest";
+  $("#signinForm")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    pulse("AUTH OK • ROUTING… (demo)");
+    setTimeout(() => pulse("SYSTEM ONLINE • READY"), 1400);
+    const m = $("#signin");
+    if (m) closeModal(m);
+  });
 
-  modalSubmit.textContent =
-    mode === "signup" ? "Create account"
-    : mode === "signin" ? "Sign in"
-    : "Continue as guest";
+  $("#signupForm")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    pulse("PROFILE CREATED • ASSIGNING TIER… (demo)");
+    setTimeout(() => pulse("SYSTEM ONLINE • READY"), 1600);
+    const m = $("#signup");
+    if (m) closeModal(m);
+  });
 
-  modal.setAttribute("aria-hidden", "false");
+  $("#guest")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    pulse("GUEST SESSION • LIMITED ACCESS (demo)");
+    setTimeout(() => pulse("SYSTEM ONLINE • READY"), 1600);
+    // later: window.location.href = "/app";
+  });
 
-  // focus first visible input
-  setTimeout(() => {
-    const first =
-      mode === "signin" ? $("#fieldEmail input")
-      : mode === "signup" ? $("#fieldName input")
-      : $("#fieldName input");
-    first?.focus();
-  }, 50);
-}
+  // Ambient FX (soft particles + scan drift)
+  const canvas = document.getElementById("fx");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d", { alpha: true });
 
-function closeModal(){
-  modal.setAttribute("aria-hidden", "true");
-  $("#modalForm").reset();
-}
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReduced) return;
 
-$("#btnSignup").addEventListener("click", () => openModal("signup"));
-$("#btnSignin").addEventListener("click", () => openModal("signin"));
-$("#btnGuest").addEventListener("click", () => openModal("guest"));
+  let w=0,h=0,dpr=1;
+  const pts = [];
+  const rand = (a,b)=>a+Math.random()*(b-a);
 
-modal.addEventListener("click", (e) => {
-  if (e.target?.dataset?.close) closeModal();
-});
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && modal.getAttribute("aria-hidden") === "false") closeModal();
-});
+    pts.length = 0;
+    const n = Math.floor(Math.min(120, Math.max(70, (w*h)/18000)));
+    for(let i=0;i<n;i++){
+      pts.push({
+        x: rand(0,w), y: rand(0,h),
+        r: rand(0.8, 2.2),
+        vx: rand(-0.12, 0.12),
+        vy: rand(-0.10, 0.10),
+        a: rand(0.05, 0.12)
+      });
+    }
+  }
+  window.addEventListener("resize", resize, { passive:true });
+  resize();
 
-// Demo submit: route to next page (placeholder)
-$("#modalForm").addEventListener("submit", (e) => {
-  e.preventDefault();
+  let t=0;
+  function draw(){
+    t += 0.01;
+    ctx.clearRect(0,0,w,h);
 
-  // Here’s where we’d actually call auth + store user/session.
-  // For now, we stash a tiny session and "continue".
-  const data = Object.fromEntries(new FormData(e.target).entries());
-  const session = {
-    mode,
-    name: data.name || (mode === "guest" ? "Guest" : ""),
-    email: data.email || "",
-    note: data.note || "",
-    at: new Date().toISOString()
-  };
-  localStorage.setItem("satcorp_session", JSON.stringify(session));
+    // scanline drift
+    ctx.globalAlpha = 0.07;
+    const y = (Math.sin(t*0.9)*0.5+0.5)*h;
+    const grd = ctx.createLinearGradient(0, y-140, 0, y+140);
+    grd.addColorStop(0, "rgba(138,92,255,0)");
+    grd.addColorStop(0.5, "rgba(138,92,255,0.35)");
+    grd.addColorStop(1, "rgba(138,92,255,0)");
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, y-140, w, 280);
 
-  // Redirect stub (you can replace this with /app.html later)
-  window.location.href = "lobby.html";
-});
+    // particles
+    ctx.globalAlpha = 1;
+    for(const p of pts){
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < -20) p.x = w+20;
+      if (p.x > w+20) p.x = -20;
+      if (p.y < -20) p.y = h+20;
+      if (p.y > h+20) p.y = -20;
 
-// clock
-function tick(){
-  const d = new Date();
-  const hh = String(d.getHours()).padStart(2,"0");
-  const mm = String(d.getMinutes()).padStart(2,"0");
-  $("#clock").textContent = `${hh}:${mm}`;
-}
-tick();
-setInterval(tick, 10000);
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(177,139,255,${p.a})`;
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
