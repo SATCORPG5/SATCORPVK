@@ -3,62 +3,62 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SATCORP — Gateway</title>
-  <meta name="description" content="SATCORP access gateway: sign in, sign up, or continue as guest." />
-  <meta name="theme-color" content="#07070b" />
+  <title>SATCORP — Matrix Gateway</title>
+  <meta name="description" content="SATCORP access gateway: sign in, sign up, or join as guest." />
+  <meta name="theme-color" content="#020604" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
+  <!-- Matrix Rain -->
+  <canvas id="matrix" aria-hidden="true"></canvas>
+
   <main class="wrap" aria-label="SATCORP Gateway">
-    <section class="panel" role="region" aria-label="Access Panel">
-      <header class="header">
-        <div class="mark" aria-hidden="true">
-          <div class="mark__ring"></div>
-          <div class="mark__core"></div>
+    <section class="terminal" role="region" aria-label="Access Terminal">
+      <header class="topbar">
+        <div class="sig">
+          <span class="dot"></span>
+          <span class="dot dot--mid"></span>
+          <span class="dot dot--dim"></span>
+          <span class="sep"></span>
+          <span class="mono">SATCORP://GATEWAY</span>
         </div>
 
-        <div class="brand">
-          <div class="brand__top">
-            <span class="chip">SATCORP</span>
-            <span class="chip chip--ghost">SECURE ACCESS</span>
-          </div>
-          <h1 class="title">Gateway Interface</h1>
-          <p class="sub">Choose your entry path. Credentials optional. Control guaranteed.</p>
-        </div>
+        <div class="right mono" id="clock">00:00:00</div>
       </header>
 
-      <div class="actions" role="group" aria-label="Gateway Actions">
-        <button class="btn btn--primary" data-open="signin">
-          <span class="btn__label">Sign In</span>
-          <span class="btn__hint">existing operator</span>
-        </button>
+      <div class="crt">
+        <div class="badge mono">ACCESS NODE</div>
+        <h1 class="title">MATRIX GATEWAY</h1>
+        <p class="sub mono">
+          Choose your route. Authenticate or enter as a guest session.
+        </p>
 
-        <button class="btn" data-open="signup">
-          <span class="btn__label">Sign Up</span>
-          <span class="btn__hint">new clearance</span>
-        </button>
+        <div class="grid" role="group" aria-label="Gateway Actions">
+          <button class="btn btn--primary" data-open="signin">
+            <span class="btn__label">SIGN IN</span>
+            <span class="btn__hint mono">operator login</span>
+          </button>
 
-        <a class="btn btn--ghost" href="#" id="guest">
-          <span class="btn__label">Join as Guest</span>
-          <span class="btn__hint">limited access</span>
-        </a>
+          <button class="btn" data-open="signup">
+            <span class="btn__label">SIGN UP</span>
+            <span class="btn__hint mono">request clearance</span>
+          </button>
+
+          <a class="btn btn--ghost" href="#" id="guest">
+            <span class="btn__label">JOIN AS GUEST</span>
+            <span class="btn__hint mono">limited access</span>
+          </a>
+        </div>
+
+        <div class="statusline">
+          <span class="pulse"></span>
+          <span class="mono" id="statusText">SYSTEM ONLINE • READY</span>
+        </div>
       </div>
-
-      <footer class="footer">
-        <div class="status">
-          <span class="dot" aria-hidden="true"></span>
-          <span id="statusText">SYSTEM ONLINE • READY</span>
-        </div>
-        <div class="meta">
-          <span class="mono">v0.1</span>
-          <span class="sep">•</span>
-          <span class="mono">SATCORP Network</span>
-        </div>
-      </footer>
     </section>
 
     <!-- Modal: Sign In -->
@@ -67,34 +67,30 @@
       <div class="modal__card" role="document">
         <div class="modal__top">
           <div>
-            <div class="modal__kicker mono">AUTH</div>
-            <h2 class="modal__title">Sign In</h2>
-            <p class="modal__sub">Use operator credentials to enter.</p>
+            <div class="kicker mono">AUTH</div>
+            <h2 class="mtitle">SIGN IN</h2>
+            <p class="msub mono">Enter operator credentials.</p>
           </div>
-          <button class="iconbtn" data-close aria-label="Close">
-            ✕
-          </button>
+          <button class="xbtn" data-close aria-label="Close">✕</button>
         </div>
 
         <form class="form" id="signinForm">
           <label class="field">
-            <span class="field__label">Email</span>
-            <input class="input" type="email" name="email" autocomplete="email" placeholder="operator@satcorp.net" required />
+            <span class="label mono">EMAIL</span>
+            <input class="input mono" type="email" name="email" autocomplete="email" placeholder="operator@satcorp.net" required />
           </label>
 
           <label class="field">
-            <span class="field__label">Password</span>
-            <input class="input" type="password" name="password" autocomplete="current-password" placeholder="••••••••" required />
+            <span class="label mono">PASSWORD</span>
+            <input class="input mono" type="password" name="password" autocomplete="current-password" placeholder="••••••••" required />
           </label>
 
           <button class="btn btn--primary btn--full" type="submit">
-            <span class="btn__label">Enter</span>
-            <span class="btn__hint">verify & proceed</span>
+            <span class="btn__label">ENTER</span>
+            <span class="btn__hint mono">verify & proceed</span>
           </button>
 
-          <p class="fineprint">
-            Demo UI only (no backend yet). Next: wire this to your auth provider / API.
-          </p>
+          <p class="fine mono">Demo UI only (no backend wired yet).</p>
         </form>
       </div>
     </section>
@@ -105,45 +101,38 @@
       <div class="modal__card" role="document">
         <div class="modal__top">
           <div>
-            <div class="modal__kicker mono">ONBOARD</div>
-            <h2 class="modal__title">Sign Up</h2>
-            <p class="modal__sub">Create your operator identity.</p>
+            <div class="kicker mono">ONBOARD</div>
+            <h2 class="mtitle">SIGN UP</h2>
+            <p class="msub mono">Initialize new operator profile.</p>
           </div>
-          <button class="iconbtn" data-close aria-label="Close">
-            ✕
-          </button>
+          <button class="xbtn" data-close aria-label="Close">✕</button>
         </div>
 
         <form class="form" id="signupForm">
           <label class="field">
-            <span class="field__label">Handle</span>
-            <input class="input" type="text" name="handle" autocomplete="nickname" placeholder="ANU" required />
+            <span class="label mono">HANDLE</span>
+            <input class="input mono" type="text" name="handle" autocomplete="nickname" placeholder="ANU" required />
           </label>
 
           <label class="field">
-            <span class="field__label">Email</span>
-            <input class="input" type="email" name="email" autocomplete="email" placeholder="you@domain.com" required />
+            <span class="label mono">EMAIL</span>
+            <input class="input mono" type="email" name="email" autocomplete="email" placeholder="you@domain.com" required />
           </label>
 
           <label class="field">
-            <span class="field__label">Password</span>
-            <input class="input" type="password" name="password" autocomplete="new-password" placeholder="min 8 chars" minlength="8" required />
+            <span class="label mono">PASSWORD</span>
+            <input class="input mono" type="password" name="password" autocomplete="new-password" placeholder="min 8 chars" minlength="8" required />
           </label>
 
           <button class="btn btn--primary btn--full" type="submit">
-            <span class="btn__label">Create Access</span>
-            <span class="btn__hint">initialize profile</span>
+            <span class="btn__label">CREATE ACCESS</span>
+            <span class="btn__hint mono">assign tier</span>
           </button>
 
-          <p class="fineprint">
-            Demo UI only (no backend yet). Next: email verification + tier assignment.
-          </p>
+          <p class="fine mono">Demo UI only (no backend wired yet).</p>
         </form>
       </div>
     </section>
-
-    <!-- Ambient canvas -->
-    <canvas id="fx" aria-hidden="true"></canvas>
   </main>
 
   <script src="script.js"></script>
