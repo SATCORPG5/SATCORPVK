@@ -1,137 +1,94 @@
+<!-- index.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SATCORP — Matrix Gateway</title>
-  <meta name="description" content="SATCORP access gateway: sign in, sign up, or join as guest." />
-  <meta name="theme-color" content="#020604" />
+  <title>NEOCORE // MATRIX INTERFACE</title>
+  <meta name="description" content="Hardcore Matrix-style landing interface." />
+  <meta name="theme-color" content="#020603" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
-  <!-- Matrix Rain -->
-  <canvas id="matrix" aria-hidden="true"></canvas>
+  <!-- Background -->
+  <canvas id="rain" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
 
-  <main class="wrap" aria-label="SATCORP Gateway">
-    <section class="terminal" role="region" aria-label="Access Terminal">
-      <header class="topbar">
-        <div class="sig">
-          <span class="dot"></span>
-          <span class="dot dot--mid"></span>
-          <span class="dot dot--dim"></span>
-          <span class="sep"></span>
-          <span class="mono">SATCORP://GATEWAY</span>
+  <!-- Top HUD -->
+  <header class="hud">
+    <div class="hud__left">
+      <span class="dot"></span>
+      <span class="label">SYSTEM</span>
+      <span class="value">ONLINE</span>
+    </div>
+
+    <div class="hud__center">
+      <span class="chip">NEOCORE</span>
+      <span class="sep">/</span>
+      <span class="chip chip--soft">ACCESS NODE</span>
+    </div>
+
+    <div class="hud__right">
+      <span class="label">LATENCY</span>
+      <span class="value" id="latency">0ms</span>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="wrap">
+    <section class="panel">
+      <div class="panel__top">
+        <div class="panel__title">
+          <span class="tag">MATRIX</span>
+          <span class="tag tag--dim">TERMINAL</span>
         </div>
-
-        <div class="right mono" id="clock">00:00:00</div>
-      </header>
-
-      <div class="crt">
-        <div class="badge mono">ACCESS NODE</div>
-        <h1 class="title">MATRIX GATEWAY</h1>
-        <p class="sub mono">
-          Choose your route. Authenticate or enter as a guest session.
-        </p>
-
-        <div class="grid" role="group" aria-label="Gateway Actions">
-          <button class="btn btn--primary" data-open="signin">
-            <span class="btn__label">SIGN IN</span>
-            <span class="btn__hint mono">operator login</span>
-          </button>
-
-          <button class="btn" data-open="signup">
-            <span class="btn__label">SIGN UP</span>
-            <span class="btn__hint mono">request clearance</span>
-          </button>
-
-          <a class="btn btn--ghost" href="#" id="guest">
-            <span class="btn__label">JOIN AS GUEST</span>
-            <span class="btn__hint mono">limited access</span>
-          </a>
-        </div>
-
-        <div class="statusline">
-          <span class="pulse"></span>
-          <span class="mono" id="statusText">SYSTEM ONLINE • READY</span>
+        <div class="panel__lights" aria-hidden="true">
+          <span class="light"></span><span class="light"></span><span class="light"></span>
         </div>
       </div>
-    </section>
 
-    <!-- Modal: Sign In -->
-    <section class="modal" id="signin" aria-hidden="true" aria-label="Sign In Modal" role="dialog">
-      <div class="modal__backdrop" data-close></div>
-      <div class="modal__card" role="document">
-        <div class="modal__top">
-          <div>
-            <div class="kicker mono">AUTH</div>
-            <h2 class="mtitle">SIGN IN</h2>
-            <p class="msub mono">Enter operator credentials.</p>
-          </div>
-          <button class="xbtn" data-close aria-label="Close">✕</button>
+      <h1 class="hero glitch" data-text="ENTER THE SIGNAL">
+        ENTER THE SIGNAL
+      </h1>
+
+      <p class="sub">
+        A hardened interface for operators. Authenticate, jack in, or proceed as a ghost.
+      </p>
+
+      <div class="actions">
+        <a class="btn" href="#signin">SIGN IN</a>
+        <a class="btn btn--ghost" href="#signup">SIGN UP</a>
+        <a class="btn btn--wire" href="#guest">JOIN AS GUEST</a>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="terminal" role="region" aria-label="Console output">
+        <div class="terminal__header">
+          <span class="terminal__name">console://neocore</span>
+          <span class="terminal__meta" id="clock">--:--:--</span>
         </div>
+        <div class="terminal__body" id="log" aria-live="polite"></div>
 
-        <form class="form" id="signinForm">
-          <label class="field">
-            <span class="label mono">EMAIL</span>
-            <input class="input mono" type="email" name="email" autocomplete="email" placeholder="operator@satcorp.net" required />
-          </label>
-
-          <label class="field">
-            <span class="label mono">PASSWORD</span>
-            <input class="input mono" type="password" name="password" autocomplete="current-password" placeholder="••••••••" required />
-          </label>
-
-          <button class="btn btn--primary btn--full" type="submit">
-            <span class="btn__label">ENTER</span>
-            <span class="btn__hint mono">verify & proceed</span>
-          </button>
-
-          <p class="fine mono">Demo UI only (no backend wired yet).</p>
+        <form class="cmd" id="cmdForm" autocomplete="off">
+          <span class="cmd__prompt">operator@matrix:~$</span>
+          <input id="cmdInput" class="cmd__input" name="cmd" spellcheck="false" autocapitalize="off" autocomplete="off" />
+          <button class="cmd__send" type="submit">EXEC</button>
         </form>
-      </div>
-    </section>
-
-    <!-- Modal: Sign Up -->
-    <section class="modal" id="signup" aria-hidden="true" aria-label="Sign Up Modal" role="dialog">
-      <div class="modal__backdrop" data-close></div>
-      <div class="modal__card" role="document">
-        <div class="modal__top">
-          <div>
-            <div class="kicker mono">ONBOARD</div>
-            <h2 class="mtitle">SIGN UP</h2>
-            <p class="msub mono">Initialize new operator profile.</p>
-          </div>
-          <button class="xbtn" data-close aria-label="Close">✕</button>
+        <div class="hint">
+          Try: <code>help</code>, <code>status</code>, <code>clear</code>, <code>jack-in</code>
         </div>
-
-        <form class="form" id="signupForm">
-          <label class="field">
-            <span class="label mono">HANDLE</span>
-            <input class="input mono" type="text" name="handle" autocomplete="nickname" placeholder="ANU" required />
-          </label>
-
-          <label class="field">
-            <span class="label mono">EMAIL</span>
-            <input class="input mono" type="email" name="email" autocomplete="email" placeholder="you@domain.com" required />
-          </label>
-
-          <label class="field">
-            <span class="label mono">PASSWORD</span>
-            <input class="input mono" type="password" name="password" autocomplete="new-password" placeholder="min 8 chars" minlength="8" required />
-          </label>
-
-          <button class="btn btn--primary btn--full" type="submit">
-            <span class="btn__label">CREATE ACCESS</span>
-            <span class="btn__hint mono">assign tier</span>
-          </button>
-
-          <p class="fine mono">Demo UI only (no backend wired yet).</p>
-        </form>
       </div>
+
+      <footer class="foot">
+        <span>© <span id="year"></span> NEOCORE</span>
+        <span class="muted">// “There is no spoon.”</span>
+      </footer>
     </section>
   </main>
 
