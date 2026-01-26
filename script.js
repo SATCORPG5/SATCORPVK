@@ -1,380 +1,229 @@
-/* styles.css — ULTRA REAL CRT MATRIX */
-:root{
-  --bg:#020503;
-  --ink:rgba(210,255,235,.92);
-  --green:#39ff7a;
-  --green2:#00ff66;
-  --dim:rgba(170,255,210,.66);
-  --line:rgba(57,255,122,.16);
-  --shadow:rgba(0,255,120,.18);
-  --glass:rgba(0,0,0,.58);
-}
+// script.js — ULTRA REAL MATRIX RAIN + MICRO CAMERA SWAY
+(() => {
+  const $ = (id) => document.getElementById(id);
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  overflow-x:hidden;
-}
+  // Footer year
+  $("year").textContent = new Date().getFullYear();
 
-/* ===== Background Canvas ===== */
-#rain{
-  position:fixed;
-  inset:0;
-  width:100%;
-  height:100%;
-  z-index:-10;
-  background:
-    radial-gradient(1200px 700px at 50% 28%, rgba(0,255,140,.06), transparent 55%),
-    radial-gradient(900px 700px at 30% 70%, rgba(0,255,120,.045), transparent 60%),
-    linear-gradient(to bottom, rgba(0,0,0,.18), rgba(0,0,0,.75));
-}
+  // Clock
+  const clockEl = $("clock");
+  const pad = (n) => String(n).padStart(2, "0");
+  const tick = () => {
+    const d = new Date();
+    clockEl.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  };
+  tick();
+  setInterval(tick, 1000);
 
-/* ===== Cinematic Overlays ===== */
-.vignette{
-  position:fixed; inset:0; z-index:-9; pointer-events:none;
-  background:
-    radial-gradient(circle at 50% 42%, rgba(0,0,0,0) 34%, rgba(0,0,0,.62) 70%, rgba(0,0,0,.9) 98%),
-    linear-gradient(to bottom, rgba(0,0,0,.15), rgba(0,0,0,.55));
-}
+  // Fake latency
+  const latencyEl = $("latency");
+  setInterval(() => {
+    const ms = Math.floor(14 + Math.random() * 58);
+    latencyEl.textContent = `${ms}ms`;
+  }, 850);
 
-/* Bloom-like haze (subtle) */
-.bloom{
-  position:fixed; inset:-6%; z-index:-8; pointer-events:none;
-  background:
-    radial-gradient(800px 420px at 50% 28%, rgba(0,255,140,.07), transparent 55%),
-    radial-gradient(700px 520px at 65% 70%, rgba(0,255,120,.05), transparent 60%);
-  filter: blur(18px);
-  opacity:.9;
-  transform: translateZ(0);
-}
+  // Terminal log
+  const log = $("log");
+  const write = (html) => {
+    const p = document.createElement("p");
+    p.className = "line";
+    p.innerHTML = html;
+    log.appendChild(p);
+    log.scrollTop = log.scrollHeight;
+  };
 
-/* Scanlines with shimmer */
-.scanlines{
-  position:fixed; inset:0; z-index:-7; pointer-events:none;
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px);
-  background-size:100% 3px;
-  opacity:.10;
-  mix-blend-mode:overlay;
-  animation: scanMove 6s linear infinite;
-}
-@keyframes scanMove{
-  0%{transform:translateY(0)}
-  100%{transform:translateY(18px)}
-}
+  const boot = () => {
+    write(`<span class="k">[boot]</span> Calibrating phosphor glow… <span class="ok">OK</span>`);
+    write(`<span class="k">[crt]</span> Shadow-mask alignment… <span class="ok">OK</span>`);
+    write(`<span class="k">[net]</span> Establishing tunnel… <span class="ok">OK</span>`);
+    write(`<span class="k">[env]</span> Noise profile locked… <span class="ok">OK</span>`);
+    write(`<span class="k">[hint]</span> Type <span class="ok">help</span> for commands.`);
+  };
+  boot();
 
-/* CRT shadow mask (subpixel-ish) */
-.mask{
-  position:fixed; inset:0; z-index:-6; pointer-events:none;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      rgba(255,0,80,.03) 0px,
-      rgba(255,0,80,.03) 1px,
-      rgba(0,255,120,.03) 1px,
-      rgba(0,255,120,.03) 2px,
-      rgba(0,160,255,.03) 2px,
-      rgba(0,160,255,.03) 3px
-    );
-  opacity:.09;
-  mix-blend-mode:soft-light;
-}
+  const cmdForm = $("cmdForm");
+  const cmdInput = $("cmdInput");
 
-/* Film grain (animated) */
-.grain{
-  position:fixed; inset:-20%; z-index:-5; pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
-  opacity:.085;
-  mix-blend-mode:overlay;
-  animation: grainJitter 1.2s steps(2) infinite;
-}
-@keyframes grainJitter{
-  0%{transform:translate(0,0)}
-  25%{transform:translate(-1.2%, .8%)}
-  50%{transform:translate(.9%, -1.1%)}
-  75%{transform:translate(-.6%, -1.4%)}
-  100%{transform:translate(0,0)}
-}
+  const commands = {
+    help() {
+      write(`<span class="prompt">help</span> → commands: <span class="ok">status</span>, <span class="ok">jack-in</span>, <span class="ok">clear</span>, <span class="ok">whoami</span>, <span class="ok">trace</span>`);
+    },
+    status() {
+      write(`<span class="prompt">status</span> → system: <span class="ok">online</span> | node: <span class="ok">stable</span> | threat: <span class="warn">medium</span>`);
+    },
+    "jack-in"() {
+      write(`<span class="prompt">jack-in</span> → initiating neural link… <span class="ok">SYNC</span>`);
+      write(`<span class="k">[matrix]</span> signal acquired. welcome, operator.`);
+    },
+    whoami() {
+      write(`<span class="prompt">whoami</span> → <span class="ok">operator</span> (guest permissions)`);
+    },
+    trace() {
+      write(`<span class="prompt">trace</span> → tracing sentinel path… <span class="warn">blocked</span>`);
+      write(`<span class="k">[advice]</span> use <span class="ok">sign in</span> for elevated access.`);
+    },
+    clear() {
+      log.innerHTML = "";
+      write(`<span class="k">[console]</span> cleared.`);
+    }
+  };
 
-/* ===== HUD ===== */
-.hud{
-  position:fixed; top:0; left:0; right:0;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:14px 16px;
-  font-family:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  background:linear-gradient(to bottom, rgba(0,0,0,.72), rgba(0,0,0,.18));
-  border-bottom:1px solid rgba(57,255,122,.12);
-  backdrop-filter: blur(12px);
-}
-.hud__left,.hud__center,.hud__right{display:flex; gap:10px; align-items:center}
-.dot{
-  width:10px;height:10px;border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 22px rgba(57,255,122,.55);
-}
-.label{opacity:.72; letter-spacing:.08em; font-size:12px}
-.value{color:rgba(180,255,210,.9); font-weight:600}
-.chip{
-  padding:6px 10px;
-  border:1px solid rgba(57,255,122,.18);
-  border-radius:999px;
-  background:rgba(0,0,0,.38);
-  text-transform:uppercase;
-  letter-spacing:.12em;
-  font-size:12px;
-  box-shadow:0 0 0 1px rgba(0,255,120,.05) inset;
-}
-.chip--soft{opacity:.85}
-.sep{opacity:.45}
+  cmdForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const raw = (cmdInput.value || "").trim();
+    if (!raw) return;
 
-/* ===== Layout / Panel ===== */
-.wrap{
-  min-height:100%;
-  display:grid;
-  place-items:center;
-  padding:92px 16px 40px;
-}
-.panel{
-  width:min(980px, 100%);
-  border-radius:18px;
-  overflow:hidden;
+    const key = raw.toLowerCase();
+    write(`<span class="prompt">> ${raw}</span>`);
 
-  /* realistic glass + depth */
-  background:
-    linear-gradient(180deg, rgba(0,0,0,.70), rgba(0,0,0,.35));
-  border:1px solid rgba(57,255,122,.16);
-  box-shadow:
-    0 0 0 1px rgba(0,255,120,.06) inset,
-    0 30px 90px rgba(0,0,0,.75),
-    0 0 80px rgba(0,255,120,.06);
-  backdrop-filter: blur(10px);
-  transform: translateZ(0);
-}
-.panel__top{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:14px 16px;
-  border-bottom:1px solid rgba(57,255,122,.10);
-  background:rgba(0,0,0,.40);
-}
-.panel__title{display:flex; gap:8px}
-.tag{
-  font-family:"JetBrains Mono", ui-monospace, monospace;
-  font-size:12px;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  padding:6px 10px;
-  border:1px solid rgba(57,255,122,.18);
-  border-radius:10px;
-  color:rgba(150,255,200,.95);
-  background:rgba(0,255,120,.03);
-}
-.tag--dim{opacity:.75}
-.panel__lights{display:flex; gap:7px}
-.light{
-  width:10px;height:10px;border-radius:50%;
-  border:1px solid rgba(57,255,122,.18);
-  background:rgba(0,0,0,.30);
-  box-shadow:0 0 18px rgba(57,255,122,.18);
-}
+    if (key === "sign in" || key === "signin") location.hash = "signin";
+    else if (key === "sign up" || key === "signup") location.hash = "signup";
+    else if (key === "guest" || key === "join as guest") location.hash = "guest";
+    else if (commands[key]) commands[key]();
+    else {
+      write(`<span class="k">[err]</span> unknown command: <span class="err">${raw}</span>`);
+      write(`<span class="k">[hint]</span> try <span class="ok">help</span>`);
+    }
 
-/* Text with subtle chromatic aberration feel */
-.hero{
-  margin:18px 16px 0;
-  font-size:clamp(34px, 6vw, 72px);
-  line-height:1.02;
-  letter-spacing:-.02em;
-  font-weight:800;
-  color:rgba(120,255,175,.95);
-  text-shadow:
-    0 0 22px rgba(0,255,120,.22),
-    1px 0 0 rgba(0,255,120,.15),
-   -1px 0 0 rgba(0,180,255,.06);
-}
-.sub{
-  margin:10px 16px 0;
-  max-width:70ch;
-  color:var(--dim);
-  font-size:16px;
-  line-height:1.6;
-}
+    cmdInput.value = "";
+    cmdInput.focus();
+  });
 
-.actions{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  margin:18px 16px 0;
-}
-.btn{
-  font-family:"JetBrains Mono", ui-monospace, monospace;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  font-size:13px;
-  padding:12px 14px;
-  border-radius:12px;
-  border:1px solid rgba(57,255,122,.22);
-  color:rgba(0,20,10,.95);
-  background:linear-gradient(180deg, rgba(60,255,125,.98), rgba(0,190,78,.88));
-  box-shadow:
-    0 16px 36px rgba(0,255,120,.12),
-    0 0 0 1px rgba(0,255,120,.10) inset;
-  text-decoration:none;
-  transition:transform .15s ease, filter .15s ease;
-}
-.btn:hover{transform:translateY(-1px); filter:brightness(1.04)}
-.btn:active{transform:translateY(0px); filter:brightness(.98)}
-.btn--ghost{
-  color:rgba(150,255,200,.95);
-  background:rgba(0,0,0,.44);
-}
-.btn--wire{
-  color:rgba(210,255,235,.92);
-  background:transparent;
-  border:1px dashed rgba(57,255,122,.30);
-}
+  setTimeout(() => cmdInput.focus(), 350);
+  document.addEventListener("click", (e) => {
+    if (e.target.closest(".terminal")) cmdInput.focus();
+  });
 
-.divider{
-  height:1px;
-  margin:18px 16px;
-  background:linear-gradient(90deg, transparent, rgba(57,255,122,.22), transparent);
-}
+  // Respect reduced motion
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReduced) return;
 
-/* ===== Terminal ===== */
-.terminal{
-  margin:0 16px 18px;
-  border-radius:16px;
-  border:1px solid rgba(57,255,122,.16);
-  background:rgba(0,0,0,.58);
-  box-shadow:
-    0 0 0 1px rgba(0,255,120,.05) inset,
-    0 0 70px rgba(0,255,120,.04);
-  overflow:hidden;
-}
-.terminal__header{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:12px 12px;
-  border-bottom:1px solid rgba(57,255,122,.10);
-  font-family:"JetBrains Mono", ui-monospace, monospace;
-  font-size:12px;
-  color:rgba(200,255,220,.86);
-}
-.terminal__body{
-  font-family:"JetBrains Mono", ui-monospace, monospace;
-  padding:12px;
-  min-height:170px;
-  max-height:260px;
-  overflow:auto;
-  scrollbar-color: rgba(57,255,122,.28) rgba(0,0,0,.35);
-}
+  // Micro camera sway (realistic)
+  const panel = document.querySelector(".panel");
+  let mx = 0, my = 0, tx = 0, ty = 0;
+  window.addEventListener("pointermove", (e) => {
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    tx = (e.clientX - cx) / cx;
+    ty = (e.clientY - cy) / cy;
+  }, { passive:true });
 
-/* Command + lines */
-.line{margin:0 0 8px 0; color:rgba(205,255,225,.9)}
-.line .ok{color:rgba(90,255,165,.98)}
-.line .warn{color:#c8ff6a}
-.line .err{color:#ff4d6d}
-.k{color:rgba(170,255,210,.62)}
-.prompt{color:rgba(90,255,165,.92)}
+  function sway(){
+    mx += (tx - mx) * 0.06;
+    my += (ty - my) * 0.06;
+    const rx = (-my * 0.8).toFixed(3);
+    const ry = (mx * 1.0).toFixed(3);
+    panel.style.transform = `translateZ(0) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    requestAnimationFrame(sway);
+  }
+  requestAnimationFrame(sway);
 
-.cmd{
-  display:flex; gap:10px; align-items:center;
-  padding:12px;
-  border-top:1px solid rgba(57,255,122,.10);
-}
-.cmd__prompt{
-  font-family:"JetBrains Mono", ui-monospace, monospace;
-  color:rgba(90,255,165,.92);
-  white-space:nowrap;
-}
-.cmd__input{
-  flex:1;
-  border:1px solid rgba(57,255,122,.14);
-  background:rgba(0,0,0,.40);
-  color:rgba(215,255,235,.95);
-  border-radius:12px;
-  padding:10px 12px;
-  outline:none;
-  font-family:"JetBrains Mono", ui-monospace, monospace;
-  box-shadow:0 0 0 1px rgba(0,255,120,.04) inset;
-}
-.cmd__input:focus{
-  border-color:rgba(57,255,122,.34);
-  box-shadow:0 0 0 4px rgba(0,255,120,.07), 0 0 0 1px rgba(0,255,120,.06) inset;
-}
-.cmd__send{
-  font-family:"JetBrains Mono", ui-monospace, monospace;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  font-size:12px;
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid rgba(57,255,122,.18);
-  background:rgba(0,0,0,.38);
-  color:rgba(120,255,175,.95);
-  cursor:pointer;
-}
-.cmd__send:hover{filter:brightness(1.08)}
+  // ===== Ultra-real Matrix rain (multi-layer depth) =====
+  const canvas = $("rain");
+  const ctx = canvas.getContext("2d", { alpha: true });
 
-.hint{
-  padding:0 12px 12px;
-  color:rgba(180,255,210,.62);
-  font-family:"JetBrains Mono", ui-monospace, monospace;
-  font-size:12px;
-}
-.hint code{
-  color:rgba(90,255,165,.95);
-  background:rgba(0,255,120,.05);
-  border:1px solid rgba(57,255,122,.12);
-  padding:2px 6px;
-  border-radius:8px;
-}
+  const glyphs = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワ0123456789#$%*+-<>/\\|";
+  const pick = () => glyphs[(Math.random() * glyphs.length) | 0];
 
-.foot{
-  display:flex; justify-content:space-between; gap:12px;
-  padding:12px 16px 16px;
-  border-top:1px solid rgba(57,255,122,.10);
-  font-family:"JetBrains Mono", ui-monospace, monospace;
-  color:rgba(190,255,220,.68);
-  font-size:12px;
-}
-.muted{opacity:.7}
+  let w = 0, h = 0, dpr = 1, fontSize = 16, cols = 0;
 
-/* Subtle, more realistic glitch (less “cartoon”) */
-.glitch{ position:relative; display:inline-block; }
-.glitch::before, .glitch::after{
-  content:attr(data-text);
-  position:absolute; left:0; top:0;
-  width:100%;
-  opacity:.35;
-  filter: blur(.2px);
-  pointer-events:none;
-}
-.glitch::before{
-  transform:translate(1px,0);
-  color:rgba(0,255,120,.65);
-  clip-path: inset(0 0 60% 0);
-  animation: g1 4.8s infinite ease-in-out;
-}
-.glitch::after{
-  transform:translate(-1px,0);
-  color:rgba(0,160,255,.22);
-  clip-path: inset(60% 0 0 0);
-  animation: g2 6.2s infinite ease-in-out;
-}
-@keyframes g1{
-  0%,100%{clip-path: inset(0 0 62% 0); opacity:.20}
-  45%{clip-path: inset(12% 0 52% 0); opacity:.34}
-  60%{clip-path: inset(2% 0 68% 0); opacity:.18}
-}
-@keyframes g2{
-  0%,100%{clip-path: inset(58% 0 0 0); opacity:.16}
-  38%{clip-path: inset(68% 0 0 0); opacity:.28}
-  72%{clip-path: inset(52% 0 0 0); opacity:.14}
-}
+  // Each column has 2 layers: near + far
+  let near = [];
+  let far = [];
 
-@media (max-width:520px){
-  .hud__center{display:none}
-  .foot{flex-direction:column; align-items:flex-start}
-}
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    fontSize = Math.max(14, Math.floor(w / 86));
+    cols = Math.floor(w / fontSize);
+
+    near = new Array(cols).fill(0).map(() => ({
+      y: Math.random() * -80,
+      v: 0.95 + Math.random() * 0.55,
+      tail: 10 + (Math.random() * 14 | 0)
+    }));
+    far = new Array(cols).fill(0).map(() => ({
+      y: Math.random() * -110,
+      v: 0.55 + Math.random() * 0.35,
+      tail: 8 + (Math.random() * 10 | 0)
+    }));
+  }
+  window.addEventListener("resize", resize, { passive:true });
+  resize();
+
+  let last = performance.now();
+  function drawLayer(layer, alphaBase, blurAmount){
+    ctx.save();
+    if (blurAmount) ctx.filter = `blur(${blurAmount}px)`;
+    ctx.font = `600 ${fontSize}px "JetBrains Mono", ui-monospace, monospace`;
+
+    for (let i = 0; i < cols; i++) {
+      const x = i * fontSize;
+      const d = layer[i];
+
+      // head
+      const y = d.y * fontSize;
+      const headCh = pick();
+
+      // tail (gradient feel by stepping alpha)
+      for (let t = 0; t < d.tail; t++) {
+        const ch = pick();
+        const yy = y - t * fontSize;
+        const a = Math.max(0, alphaBase * (1 - t / d.tail));
+        if (yy < -fontSize) continue;
+        if (yy > h + fontSize) break;
+        ctx.fillStyle = `rgba(57, 255, 122, ${a})`;
+        ctx.fillText(ch, x, yy);
+      }
+
+      // bright head
+      ctx.fillStyle = `rgba(210, 255, 235, ${Math.min(0.9, alphaBase + 0.35)})`;
+      ctx.fillText(headCh, x, y);
+
+      // advance
+      d.y += d.v;
+      if (y > h + (d.tail * fontSize) && Math.random() > 0.975) {
+        d.y = Math.random() * -60;
+        d.v = (layer === near) ? (0.95 + Math.random() * 0.6) : (0.55 + Math.random() * 0.4);
+        d.tail = (layer === near) ? (10 + (Math.random() * 16 | 0)) : (8 + (Math.random() * 12 | 0));
+      }
+    }
+    ctx.restore();
+  }
+
+  function frame(now){
+    const dt = Math.min(40, now - last);
+    last = now;
+
+    // Fading persistence (CRT-ish)
+    ctx.fillStyle = "rgba(0, 0, 0, 0.075)";
+    ctx.fillRect(0, 0, w, h);
+
+    // Slow time-based alpha “breathing”
+    const pulse = 0.06 * Math.sin(now / 900) + 0.0;
+
+    // Far layer (softer, dimmer)
+    drawLayer(far, 0.20 + pulse, 0.6);
+
+    // Near layer (sharper, brighter)
+    drawLayer(near, 0.32 + pulse, 0.0);
+
+    // dt influence (speed feels consistent)
+    const k = dt / 16.7;
+    for (let i = 0; i < cols; i++){
+      near[i].y += 0.45 * (k - 1);
+      far[i].y += 0.25 * (k - 1);
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
