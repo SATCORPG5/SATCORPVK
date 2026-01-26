@@ -1,4 +1,4 @@
-// script.js — ULTRA REAL MATRIX RAIN + MICRO CAMERA SWAY
+// script.js — ULTRA-REALISTIC CRT MATRIX (rain + console + flicker + rolling band)
 (() => {
   const $ = (id) => document.getElementById(id);
 
@@ -76,11 +76,18 @@
     const key = raw.toLowerCase();
     write(`<span class="prompt">> ${raw}</span>`);
 
-    if (key === "sign in" || key === "signin") location.hash = "signin";
-    else if (key === "sign up" || key === "signup") location.hash = "signup";
-    else if (key === "guest" || key === "join as guest") location.hash = "guest";
-    else if (commands[key]) commands[key]();
-    else {
+    if (key === "sign in" || key === "signin") {
+      write(`<span class="k">[route]</span> → /#signin (demo)`);
+      location.hash = "signin";
+    } else if (key === "sign up" || key === "signup") {
+      write(`<span class="k">[route]</span> → /#signup (demo)`);
+      location.hash = "signup";
+    } else if (key === "guest" || key === "join as guest") {
+      write(`<span class="k">[route]</span> → /#guest (demo)`);
+      location.hash = "guest";
+    } else if (commands[key]) {
+      commands[key]();
+    } else {
       write(`<span class="k">[err]</span> unknown command: <span class="err">${raw}</span>`);
       write(`<span class="k">[hint]</span> try <span class="ok">help</span>`);
     }
@@ -98,9 +105,9 @@
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (prefersReduced) return;
 
-  // Micro camera sway (realistic)
-  const panel = document.querySelector(".panel");
+  // ===== Micro camera sway + CRT flicker + rolling band =====
   let mx = 0, my = 0, tx = 0, ty = 0;
+
   window.addEventListener("pointermove", (e) => {
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
@@ -108,12 +115,25 @@
     ty = (e.clientY - cy) / cy;
   }, { passive:true });
 
+  let roll = 0;
   function sway(){
-    mx += (tx - mx) * 0.06;
-    my += (ty - my) * 0.06;
-    const rx = (-my * 0.8).toFixed(3);
-    const ry = (mx * 1.0).toFixed(3);
-    panel.style.transform = `translateZ(0) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    mx += (tx - mx) * 0.045;
+    my += (ty - my) * 0.045;
+
+    const rx = (-my * 0.55);
+    const ry = (mx * 0.75);
+
+    document.documentElement.style.setProperty("--warpX", `${rx.toFixed(3)}deg`);
+    document.documentElement.style.setProperty("--warpY", `${ry.toFixed(3)}deg`);
+
+    const base = 0.992 + Math.random() * 0.016;
+    const spike = (Math.random() < 0.03) ? (0.97 + Math.random()*0.06) : 1;
+    document.documentElement.style.setProperty("--flicker", (base * spike).toFixed(3));
+
+    roll += 0.45 + Math.random() * 0.15;
+    const y = ((roll % (window.innerHeight * 1.2)) - window.innerHeight * 0.2);
+    document.documentElement.style.setProperty("--rollY", `${y.toFixed(1)}px`);
+
     requestAnimationFrame(sway);
   }
   requestAnimationFrame(sway);
@@ -127,7 +147,6 @@
 
   let w = 0, h = 0, dpr = 1, fontSize = 16, cols = 0;
 
-  // Each column has 2 layers: near + far
   let near = [];
   let far = [];
 
@@ -143,6 +162,7 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     fontSize = Math.max(14, Math.floor(w / 86));
+    ctx.font = `600 ${fontSize}px "JetBrains Mono", ui-monospace, monospace`;
     cols = Math.floor(w / fontSize);
 
     near = new Array(cols).fill(0).map(() => ({
@@ -160,20 +180,20 @@
   resize();
 
   let last = performance.now();
+
   function drawLayer(layer, alphaBase, blurAmount){
     ctx.save();
-    if (blurAmount) ctx.filter = `blur(${blurAmount}px)`;
+    ctx.filter = blurAmount ? `blur(${blurAmount}px)` : "none";
     ctx.font = `600 ${fontSize}px "JetBrains Mono", ui-monospace, monospace`;
 
     for (let i = 0; i < cols; i++) {
       const x = i * fontSize;
       const d = layer[i];
 
-      // head
       const y = d.y * fontSize;
       const headCh = pick();
 
-      // tail (gradient feel by stepping alpha)
+      // tail
       for (let t = 0; t < d.tail; t++) {
         const ch = pick();
         const yy = y - t * fontSize;
@@ -188,14 +208,15 @@
       ctx.fillStyle = `rgba(210, 255, 235, ${Math.min(0.9, alphaBase + 0.35)})`;
       ctx.fillText(headCh, x, y);
 
-      // advance
       d.y += d.v;
+
       if (y > h + (d.tail * fontSize) && Math.random() > 0.975) {
         d.y = Math.random() * -60;
         d.v = (layer === near) ? (0.95 + Math.random() * 0.6) : (0.55 + Math.random() * 0.4);
         d.tail = (layer === near) ? (10 + (Math.random() * 16 | 0)) : (8 + (Math.random() * 12 | 0));
       }
     }
+
     ctx.restore();
   }
 
@@ -203,20 +224,19 @@
     const dt = Math.min(40, now - last);
     last = now;
 
-    // Fading persistence (CRT-ish)
+    // CRT-ish persistence fade
     ctx.fillStyle = "rgba(0, 0, 0, 0.075)";
     ctx.fillRect(0, 0, w, h);
 
-    // Slow time-based alpha “breathing”
-    const pulse = 0.06 * Math.sin(now / 900) + 0.0;
+    const pulse = 0.06 * Math.sin(now / 900);
 
-    // Far layer (softer, dimmer)
+    // Far (soft/dim)
     drawLayer(far, 0.20 + pulse, 0.6);
 
-    // Near layer (sharper, brighter)
+    // Near (sharp/brighter)
     drawLayer(near, 0.32 + pulse, 0.0);
 
-    // dt influence (speed feels consistent)
+    // keep speed consistent across refresh rates
     const k = dt / 16.7;
     for (let i = 0; i < cols; i++){
       near[i].y += 0.45 * (k - 1);
