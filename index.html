@@ -1,118 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Wild Animation</title>
-    <style>
-        /* Reset margins and ensure the canvas fills the viewport */
-        html, body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            height: 100%;
-            background: black;
-            font-family: Arial, Helvetica, sans-serif;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WILD SYSTEM</title>
 
-        /* Style the canvas element */
-        #canvas {
-            display: block;
-            width: 100vw;
-            height: 100vh;
-            /* Use a subtle radial gradient for depth */
-            background: radial-gradient(circle at center, #001f3f, #000);
-        }
+<style>
+:root {
+  --bg: #02030a;
+  --neon: #00ff9c;
+  --violet: #7f5cff;
+}
 
-        /* Add a glowing animated text overlay */
-        .overlay-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 2.5rem;
-            letter-spacing: 2px;
-            text-align: center;
-            text-shadow: 0 0 8px #00ccff, 0 0 16px #00ccff, 0 0 24px #00ccff;
-            animation: pulse 3s infinite;
-            pointer-events: none;
-        }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-        /* Pulse animation for the overlay text */
-        @keyframes pulse {
-            0% {
-                transform: translate(-50%, -50%) scale(1);
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.15);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
-    </style>
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+  color: white;
+}
+
+/* Canvas */
+canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Center Core */
+.core {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 6vw, 6rem);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  position: relative;
+  animation: glitch 2s infinite;
+}
+
+/* Glitch layers */
+h1::before,
+h1::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+h1::before {
+  color: var(--neon);
+  clip-path: inset(0 0 50% 0);
+  animation: glitchTop 2s infinite;
+}
+
+h1::after {
+  color: var(--violet);
+  clip-path: inset(50% 0 0 0);
+  animation: glitchBottom 2s infinite;
+}
+
+/* Animations */
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(2px, -2px); }
+  60% { transform: translate(-1px, 1px); }
+  80% { transform: translate(1px, -1px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes glitchTop {
+  0% { transform: translate(0); }
+  50% { transform: translate(-4px, -2px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes glitchBottom {
+  0% { transform: translate(0); }
+  50% { transform: translate(4px, 2px); }
+  100% { transform: translate(0); }
+}
+
+/* Scanlines */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.03),
+    rgba(255,255,255,0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+  z-index: 3;
+  pointer-events: none;
+}
+</style>
 </head>
+
 <body>
-    <canvas id="canvas"></canvas>
-    <div class="overlay-text">Welcome to the Wild Animation</div>
 
-    <script>
-        // Get references to the canvas and its drawing context
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+<canvas id="fx"></canvas>
 
-        // Resize the canvas to fill the browser window dynamically
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
+<div class="core">
+  <h1 data-text="SYSTEM ONLINE">SYSTEM ONLINE</h1>
+</div>
 
-        // Create an array to hold the swirling particles
-        const particles = [];
-        const numParticles = 250; // Increase for more complexity (may reduce performance)
-        for (let i = 0; i < numParticles; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            particles.push({
-                x: canvas.width / 2,
-                y: canvas.height / 2,
-                radius: Math.random() * 2 + 0.5,
-                speed: Math.random() * 0.03 + 0.02,
-                angle: angle,
-                distance: Math.random() * Math.min(canvas.width, canvas.height) / 2,
-                hue: Math.random() * 360
-            });
-        }
+<div class="scanlines"></div>
 
-        // Animation loop to update and draw particles
-        function update() {
-            // Fade the previous frame slightly to create trailing effect
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+<script>
+const canvas = document.getElementById("fx");
+const ctx = canvas.getContext("2d");
 
-            const cx = canvas.width / 2;
-            const cy = canvas.height / 2;
+let w, h;
+const particles = [];
+const COUNT = 180;
+const mouse = { x: 0, y: 0 };
 
-            particles.forEach(p => {
-                // Increase angle for continuous rotation
-                p.angle += p.speed;
-                // Increment hue to change color over time
-                p.hue = (p.hue + 0.5) % 360;
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
 
-                // Calculate new position based on angle and distance
-                p.x = cx + Math.cos(p.angle) * p.distance;
-                p.y = cy + Math.sin(p.angle) * p.distance;
+window.addEventListener("mousemove", e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
 
-                // Draw the particle
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = `hsla(${p.hue}, 100%, 50%, 0.8)`;
-                ctx.fill();
-            });
-            requestAnimationFrame(update);
-        }
-        update();
-    </script>
+class Particle {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * w;
+    this.y = Math.random() * h;
+    this.vx = (Math.random() - 0.5) * 0.6;
+    this.vy = (Math.random() - 0.5) * 0.6;
+    this.size = Math.random() * 2 + 0.5;
+  }
+  update() {
+    const dx = mouse.x - this.x;
+    const dy = mouse.y - this.y;
+    const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+
+    if (dist < 200) {
+      this.vx -= dx / dist * 0.03;
+      this.vy -= dy / dist * 0.03;
+    }
+
+    this.x += this.vx;
+    this.y += this.vy;
+
+    if (this.x < 0 || this.x > w || this.y < 0 || this.y > h) {
+      this.reset();
+    }
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(0,255,156,0.8)";
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+
+function animate() {
+  ctx.clearRect(0, 0, w, h);
+
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+
 </body>
 </html>
