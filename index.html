@@ -1,262 +1,118 @@
-<!-- index.html -->
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ANUNNAKI — The Tablets Awaken</title>
-  <meta name="description" content="An obsidian-gold interface inspired by ancient Sumer and starborne myth." />
-  <meta name="theme-color" content="#07060a" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <title>Wild Animation</title>
+    <style>
+        /* Reset margins and ensure the canvas fills the viewport */
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            background: black;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* Style the canvas element */
+        #canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            /* Use a subtle radial gradient for depth */
+            background: radial-gradient(circle at center, #001f3f, #000);
+        }
+
+        /* Add a glowing animated text overlay */
+        .overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-align: center;
+            text-shadow: 0 0 8px #00ccff, 0 0 16px #00ccff, 0 0 24px #00ccff;
+            animation: pulse 3s infinite;
+            pointer-events: none;
+        }
+
+        /* Pulse animation for the overlay text */
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.15);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+    </style>
 </head>
-
 <body>
-  <!-- Ambient layers -->
-  <div class="bg">
-    <canvas id="stars" aria-hidden="true"></canvas>
-    <div class="nebula" aria-hidden="true"></div>
-    <div class="scanlines" aria-hidden="true"></div>
-    <div class="vignette" aria-hidden="true"></div>
-  </div>
+    <canvas id="canvas"></canvas>
+    <div class="overlay-text">Welcome to the Wild Animation</div>
 
-  <header class="topbar">
-    <div class="brand">
-      <span class="sigil" aria-hidden="true">𒀭</span>
-      <div class="brand__text">
-        <div class="brand__name">ANUNNAKI</div>
-        <div class="brand__sub">Tablets • Starborn • Dominion</div>
-      </div>
-    </div>
+    <script>
+        // Get references to the canvas and its drawing context
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
 
-    <nav class="nav">
-      <a href="#lore">Lore</a>
-      <a href="#tablets">Tablets</a>
-      <a href="#portal">Portal</a>
-    </nav>
+        // Resize the canvas to fill the browser window dynamically
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
 
-    <button id="muteBtn" class="chip" type="button" aria-pressed="false" title="Toggle ambient hum">
-      AMBIENT: OFF
-    </button>
-  </header>
+        // Create an array to hold the swirling particles
+        const particles = [];
+        const numParticles = 250; // Increase for more complexity (may reduce performance)
+        for (let i = 0; i < numParticles; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            particles.push({
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                radius: Math.random() * 2 + 0.5,
+                speed: Math.random() * 0.03 + 0.02,
+                angle: angle,
+                distance: Math.random() * Math.min(canvas.width, canvas.height) / 2,
+                hue: Math.random() * 360
+            });
+        }
 
-  <main class="wrap">
-    <section class="hero">
-      <div class="hero__left">
-        <div class="badge">
-          <span class="dot"></span>
-          <span>CELESTIAL ARCHIVE ONLINE</span>
-        </div>
+        // Animation loop to update and draw particles
+        function update() {
+            // Fade the previous frame slightly to create trailing effect
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        <h1>
-          The <span class="gold">Tablets</span> Awaken.
-          <br/>
-          Enter the <span class="gold">Star-Sanctum</span>.
-        </h1>
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
 
-        <p class="lead">
-          A myth-tech interface forged from obsidian stone and luminous gold.
-          Decode the tablets, activate the portal, and listen to the hum between stars.
-        </p>
+            particles.forEach(p => {
+                // Increase angle for continuous rotation
+                p.angle += p.speed;
+                // Increment hue to change color over time
+                p.hue = (p.hue + 0.5) % 360;
 
-        <div class="cta">
-          <a class="btn btn--primary" href="#portal">Enter Portal</a>
-          <a class="btn btn--ghost" href="#tablets">Read Tablets</a>
-        </div>
+                // Calculate new position based on angle and distance
+                p.x = cx + Math.cos(p.angle) * p.distance;
+                p.y = cy + Math.sin(p.angle) * p.distance;
 
-        <div class="stats">
-          <div class="stat">
-            <div class="stat__k">𒆳</div>
-            <div class="stat__v">KUR Gate</div>
-            <div class="stat__d">sealed • awaiting key</div>
-          </div>
-          <div class="stat">
-            <div class="stat__k">𒀭</div>
-            <div class="stat__v">Divine Node</div>
-            <div class="stat__d">synced • stable</div>
-          </div>
-          <div class="stat">
-            <div class="stat__k">𒂗</div>
-            <div class="stat__v">En-Protocol</div>
-            <div class="stat__d">active • whispering</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero__right">
-        <div class="tablet">
-          <div class="tablet__rim">
-            <div class="tablet__hdr">
-              <div class="tablet__title">CELESTIAL TABLET // INTERPRETER</div>
-              <div class="tablet__lights" aria-hidden="true">
-                <span class="l l1"></span><span class="l l2"></span><span class="l l3"></span>
-              </div>
-            </div>
-
-            <div class="tablet__body">
-              <div class="glyphgrid" aria-hidden="true">
-                <span>𒀭</span><span>𒂗</span><span>𒆳</span><span>𒋀</span><span>𒄑</span>
-                <span>𒌋</span><span>𒁹</span><span>𒅆</span><span>𒊩</span><span>𒇽</span>
-                <span>𒉌</span><span>𒀀</span><span>𒌨</span><span>𒄿</span><span>𒍣</span>
-              </div>
-
-              <div class="terminal" role="region" aria-label="Tablet terminal">
-                <div class="terminal__line">
-                  <span class="prompt">TABLET:</span> <span class="muted">init</span>
-                </div>
-                <div class="terminal__line">
-                  <span class="prompt">STATUS:</span> <span class="ok">connected</span>
-                </div>
-                <div class="terminal__line">
-                  <span class="prompt">QUERY:</span> <span class="type" id="typeLine"></span><span class="caret">▍</span>
-                </div>
-                <div class="terminal__line muted small">
-                  Hint: Try <b>awakening</b>, <b>origin</b>, or <b>portal</b>.
-                </div>
-
-                <div class="terminal__input">
-                  <input id="cmd" type="text" spellcheck="false" autocomplete="off" placeholder="speak to the tablet…" />
-                  <button id="send" class="btn btn--mini" type="button">SEND</button>
-                </div>
-
-                <div id="log" class="terminal__log" aria-live="polite"></div>
-              </div>
-            </div>
-
-            <div class="tablet__ftr">
-              <span class="tag">OBSIDIAN MATRIX</span>
-              <span class="tag">GOLDEN GLYPH BUS</span>
-              <span class="tag">STARFIELD SYNC</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="lore" class="grid2">
-      <div class="card">
-        <h2>Myth-Tech Lore</h2>
-        <p>
-          This theme blends ancient Sumerian motifs, monumental stone, and a subtle sci-fi interface.
-          Think “temple chamber meets starship console.”
-        </p>
-        <ul class="bullets">
-          <li><b>Obsidian</b> for depth and weight</li>
-          <li><b>Gold</b> for divine circuitry</li>
-          <li><b>Glyphs</b> as living UI language</li>
-          <li><b>Stars</b> as the ever-watching archive</li>
-        </ul>
-      </div>
-
-      <div class="card card--highlight">
-        <h2>The Sigil</h2>
-        <p>
-          The mark <span class="gold">𒀭</span> appears across many cuneiform texts to indicate divinity.
-          Here it functions like a “system seal” — the interface is under celestial authority.
-        </p>
-        <div class="sigilBig" aria-hidden="true">𒀭</div>
-      </div>
-    </section>
-
-    <section id="tablets" class="tablets">
-      <div class="sectionTitle">
-        <h2>Tablets of Access</h2>
-        <p>Choose a tablet. Each reveals a different “channel.”</p>
-      </div>
-
-      <div class="tileGrid">
-        <button class="tile" data-reveal="awaken">
-          <div class="tile__top">
-            <span class="chip chip--gold">𒂗 EN</span>
-            <span class="chip">PROTOCOL</span>
-          </div>
-          <div class="tile__mid">Awakening Sequence</div>
-          <div class="tile__btm">Initiate resonance and prime the gate.</div>
-        </button>
-
-        <button class="tile" data-reveal="origin">
-          <div class="tile__top">
-            <span class="chip chip--gold">𒀭 DINGIR</span>
-            <span class="chip">ARCHIVE</span>
-          </div>
-          <div class="tile__mid">Origin Fragment</div>
-          <div class="tile__btm">Decode the oldest record from the vault.</div>
-        </button>
-
-        <button class="tile" data-reveal="portal">
-          <div class="tile__top">
-            <span class="chip chip--gold">𒆳 KUR</span>
-            <span class="chip">GATE</span>
-          </div>
-          <div class="tile__mid">Portal Key</div>
-          <div class="tile__btm">Unlock traversal between chambers.</div>
-        </button>
-      </div>
-
-      <div class="reveal card" id="revealCard" hidden>
-        <div class="reveal__hdr">
-          <span class="chip chip--gold" id="revealTag">TABLET</span>
-          <button class="btn btn--mini" id="closeReveal" type="button">CLOSE</button>
-        </div>
-        <h3 id="revealTitle">—</h3>
-        <p id="revealText" class="muted">—</p>
-      </div>
-    </section>
-
-    <section id="portal" class="portal">
-      <div class="card portal__card">
-        <h2>Portal Chamber</h2>
-        <p class="muted">
-          This is where you plug in your real content: signup/signin, product, lore book, stream portal,
-          or a full SATCORP “Anunnaki console” gateway.
-        </p>
-
-        <div class="portal__grid">
-          <div class="portal__pane">
-            <div class="paneTitle">Access Modes</div>
-            <div class="paneBtns">
-              <button class="btn btn--primary" type="button" id="btnSignup">Sign Up</button>
-              <button class="btn btn--ghost" type="button" id="btnSignin">Sign In</button>
-              <button class="btn btn--ghost" type="button" id="btnGuest">Join as Guest</button>
-            </div>
-            <div class="small muted">
-              Hook these buttons to real routes later (e.g. <code>/signup</code>, <code>/signin</code>, <code>/guest</code>).
-            </div>
-          </div>
-
-          <div class="portal__pane">
-            <div class="paneTitle">Transmission</div>
-            <form class="form" id="contactForm">
-              <label>
-                <span>Signal Name</span>
-                <input required name="name" placeholder="Operator name…" />
-              </label>
-              <label>
-                <span>Signal</span>
-                <textarea required name="msg" rows="4" placeholder="Your message to the chamber…"></textarea>
-              </label>
-              <button class="btn btn--primary" type="submit">Transmit</button>
-              <div id="formNote" class="small muted" aria-live="polite"></div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <footer class="footer">
-      <div class="muted small">
-        © <span id="year"></span> ANUNNAKI INTERFACE • Built in obsidian & gold.
-      </div>
-    </footer>
-  </main>
-
-  <audio id="hum" loop preload="auto">
-    <!-- Tiny embedded hum (data URI) is optional — left empty by default.
-         If you want real audio, drop a local file like /hum.mp3 and set src in JS. -->
-  </audio>
-
-  <script src="script.js"></script>
+                // Draw the particle
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${p.hue}, 100%, 50%, 0.8)`;
+                ctx.fill();
+            });
+            requestAnimationFrame(update);
+        }
+        update();
+    </script>
 </body>
 </html>
