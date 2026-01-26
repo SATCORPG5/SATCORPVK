@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SATCORP — Ops Server</title>
+  <meta name="description" content="SATCORP: Concierge-grade systems, brand, and build." />
+  <meta name="theme-color" content="#0b0f17" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <!-- Server Rail -->
+    <aside class="rail" aria-label="Servers">
+      <div class="rail__top">
+        <button class="srv srv--active" data-panel="home" title="SATCORP Ops">
+          <span class="srv__dot"></span>
+          <span class="srv__glyph">S</span>
+        </button>
+        <button class="srv" data-panel="work" title="Client Work">
+          <span class="srv__glyph">W</span>
+        </button>
+        <button class="srv" data-panel="vault" title="Vault">
+          <span class="srv__glyph">V</span>
+        </button>
+        <button class="srv" data-panel="labs" title="Labs">
+          <span class="srv__glyph">L</span>
+        </button>
+      </div>
+
+      <div class="rail__bottom">
+        <button class="srv srv--ghost" id="themeToggle" title="Toggle theme">
+          <span class="srv__glyph">☼</span>
+        </button>
+        <a class="srv srv--ghost" href="#quote" title="Request a Quote">
+          <span class="srv__glyph">+</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Channel List -->
+    <aside class="channels" aria-label="Channels">
+      <div class="channels__header">
+        <div class="brand">
+          <div class="brand__mark">SATCORP</div>
+          <div class="brand__sub">Ops Server</div>
+        </div>
+        <button class="pill" id="copyLink" title="Copy site link">Copy Invite</button>
+      </div>
+
+      <div class="channels__search">
+        <input id="search" type="search" placeholder="Search channels…" autocomplete="off" />
+      </div>
+
+      <div class="channels__group">
+        <div class="channels__groupTitle">WELCOME</div>
+        <button class="ch ch--active" data-channel="start"># start-here</button>
+        <button class="ch" data-channel="services"># services</button>
+        <button class="ch" data-channel="proof"># proof</button>
+      </div>
+
+      <div class="channels__group">
+        <div class="channels__groupTitle">OFFERINGS</div>
+        <button class="ch" data-channel="web"># websites</button>
+        <button class="ch" data-channel="brand"># brand-systems</button>
+        <button class="ch" data-channel="automation"># automation</button>
+        <button class="ch" data-channel="content"># content-systems</button>
+      </div>
+
+      <div class="channels__group">
+        <div class="channels__groupTitle">CONTACT</div>
+        <button class="ch" data-channel="quote"># request-a-quote</button>
+        <button class="ch" data-channel="faq"># faq</button>
+      </div>
+
+      <div class="me">
+        <div class="me__avatar" aria-hidden="true">A</div>
+        <div class="me__meta">
+          <div class="me__name">ANU</div>
+          <div class="me__status"><span class="dot"></span>online • concierge</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Chat -->
+    <main class="main" aria-label="Chat">
+      <header class="topbar">
+        <div class="topbar__left">
+          <div class="hash">#</div>
+          <div>
+            <div class="topbar__title" id="channelTitle">start-here</div>
+            <div class="topbar__subtitle" id="channelSubtitle">What SATCORP is and how to work with us.</div>
+          </div>
+        </div>
+
+        <div class="topbar__right">
+          <a class="btn btn--ghost" href="#services">Services</a>
+          <a class="btn btn--ghost" href="#proof">Proof</a>
+          <a class="btn btn--primary" href="#quote">Request a Quote</a>
+        </div>
+      </header>
+
+      <section class="feed" id="feed"></section>
+
+      <footer class="composer" aria-label="Composer">
+        <div class="composer__inner">
+          <div class="composer__hint">This isn’t a real chat — but you can “type” to filter content.</div>
+          <input id="composerInput" type="text" placeholder="Message #start-here" />
+          <button class="send" id="sendBtn" aria-label="Send">↵</button>
+        </div>
+      </footer>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="side" aria-label="Sidebar">
+      <div class="card">
+        <div class="card__title">Server Status</div>
+        <div class="kv">
+          <div class="k">Response</div><div class="v">Fast • Clear • Direct</div>
+          <div class="k">Delivery</div><div class="v">Organized handoff</div>
+          <div class="k">Stack</div><div class="v">Web • Brand • Automation</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">Members</div>
+        <div class="members">
+          <div class="m"><span class="dot dot--on"></span><b>ANU</b><span class="muted">Concierge</span></div>
+          <div class="m"><span class="dot dot--on"></span><b>KYRAX</b><span class="muted">Systems</span></div>
+          <div class="m"><span class="dot dot--idle"></span><b>PULSΞ</b><span class="muted">Broadcast</span></div>
+          <div class="m"><span class="dot dot--off"></span><b>Client</b><span class="muted">You</span></div>
+        </div>
+      </div>
+
+      <div class="card" id="quote">
+        <div class="card__title">Request a Quote</div>
+        <form class="form" id="quoteForm">
+          <label>
+            <span>Name</span>
+            <input required name="name" placeholder="Your name" />
+          </label>
+          <label>
+            <span>Business</span>
+            <input name="biz" placeholder="Business name (optional)" />
+          </label>
+          <label>
+            <span>What do you need?</span>
+            <select name="need" required>
+              <option value="" selected disabled>Select…</option>
+              <option>Website (new)</option>
+              <option>Website (redesign)</option>
+              <option>Brand identity</option>
+              <option>Automation / bots</option>
+              <option>Content / overlays</option>
+            </select>
+          </label>
+          <label>
+            <span>Budget range</span>
+            <select name="budget" required>
+              <option value="" selected disabled>Select…</option>
+              <option>$250–$500</option>
+              <option>$500–$1,500</option>
+              <option>$1,500–$5,000</option>
+              <option>$5,000+</option>
+            </select>
+          </label>
+          <label>
+            <span>Details</span>
+            <textarea name="details" rows="4" placeholder="Goals, timeline, links, anything helpful…"></textarea>
+          </label>
+          <button class="btn btn--primary" type="submit">Send Request</button>
+          <p class="fineprint">
+            This demo form stores nothing. Hook it to Email/Forms later.
+          </p>
+        </form>
+      </div>
+    </aside>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
